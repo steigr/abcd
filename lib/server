@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+set -x
+set -e
+
+. /etc/netboot/config
+
+. "${LIBEXEC}/helpers/parse"
+. "${LIBEXEC}/helpers/http"
+. "${LIBEXEC}/helpers/rest"
+. "${LIBEXEC}/helpers/logging"
+. "${LIBEXEC}/persistence"
+
+load_detectors
+
+OPERATION="$(basename $(echo "$PATH_INFO" | cut -f2 -d"/") )"
+
+PATH_INFO="/$(echo "$PATH_INFO" | cut -f3- -d"/")"
+
+VARIANT=$(basename $(rest_arguments variant 1))
+MAC=$(basename $(rest_arguments mac 1) || true)
+RELEASE=$(basename $(rest_arguments release 1) || true )
+PART=$(rest_arguments part 1024)
+
+[[ -e "${LIBEXEC}/requests/${OPERATION}" ]] \
+&& . "${LIBEXEC}/requests/${OPERATION}" \
+|| http_error 404

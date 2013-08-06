@@ -1,0 +1,5 @@
+#!ipxe
+kernel @BASEURL@@KERNEL@ auto=true priority=critical url=@BASEURL@@CONFIGURATION@ keymap=us console-setup/ask_detect=false console-setup/layoutcode=us
+initrd @BASEURL@@INITRD@
+boot
+

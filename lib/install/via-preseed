@@ -1,0 +1,45 @@
+#!/bin/bash
+
+strip_latecommand() {
+		cat "${1}" | grep -v -E "d-i\s+preseed/late_command" > "${1}1" && mv "${1}1" "${1}"
+}
+
+preseed_insert_script_plate() {
+	FILE="${WC}"
+	# Add our own late-command
+	cat <<'EOLATECOMMAND' >>${FILE}
+d-i preseed/late_command string \
+cat<<'EOSYSHOOK' >/target/tmp/postinstall
+@POSTINSTALL@
+EOSYSHOOK
+	in-target chmod +x /tmp/postinstall; \
+	in-target /tmp/postinstall; \
+	in-target rm /tmp/postinstall
+EOLATECOMMAND
+}
+
+pack_late_command() {
+	FILE="${WC}"
+	sed -i "/EOSYSHOOK/,/EOSYSHOOK/ s/'/\\\'/g" "${FILE}"
+	sed -i "/EOSYSHOOK/,/EOSYSHOOK/ s/$/\'\>\>\/target\/tmp\/postinstall; \\\/"  "${FILE}"
+	sed -i "/EOSYSHOOK/,/EOSYSHOOK/ s/^/echo '/" "${FILE}"
+	sed -i '/EOSYSHOOK/d' "${FILE}"
+}
+
+# Get a copy of the configuration-file
+WC=$(create_working_copy "${FILE}")
+remove_escaped_newlines "${WC}"
+strip_latecommand "${WC}"
+remove_comment_lines "${WC}"
+preseed_insert_script_plate "${WC}"
+insert_postinstall_script "${WC}"
+pack_late_command "${WC}"
+
+# Substitute Placeholders
+PLACEHOLDERS=$(get_placeholders ${WC})
+for placeholder in ${PLACEHOLDERS}; do
+	process_placeholder "${WC}" "${placeholder}"
+done
+http_get "${WC}"
+rm "${WC}"
+abcd_logger "send install/${VARIANT}/${RELEASE}/${PART}"

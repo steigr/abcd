@@ -1,0 +1,41 @@
+#!/bin/bash
+cat > /etc/systemd/system/firstboot.service<<EOUNIT
+[Unit]
+Description=Systemd Firstboot-Script
+Wants=basic.target
+After=basic.target network.target
+
+[Service]
+Type=oneshot
+ExecStart=/etc/systemd/scripts/firstboot
+
+[Install]
+WantedBy=multi-user.target
+EOUNIT
+
+ln -s /etc/systemd/system/firstboot.service /etc/systemd/system/multi-user.target.wants/firstboot.service
+mkdir /etc/systemd/scripts
+cat > /etc/systemd/scripts/firstboot <<'EOSCRIPT'
+#!/bin/bash
+sleep 10
+echo -e "\nStarting Firstboot-Script" > /dev/tty1
+if [ -x /usr/bin/curl ]; then
+	DOWNLOADER="/usr/bin/curl -o /usr/local/sbin/firstboot "
+fi
+if [ -x /usr/bin/wget ]; then
+	DOWNLOADER="/usr/bin/wget -O /usr/local/sbin/firstboot "
+fi
+
+$DOWNLOADER @BASEURL@/management/variant/generic/part/firstboot
+chmod +x /usr/local/sbin/firstboot
+cd /var/tmp
+echo -e "\nAbout to run firstboot-script" >/dev/tty1
+systemctl disable firstboot
+rm /etc/systemd/system/firstboot.service
+rm /etc/systemd/system/multi-user.target.want/firstboot.service
+rm $0
+/usr/local/sbin/firstboot
+EOSCRIPT
+
+chmod +x /etc/systemd/scripts/firstboot
+

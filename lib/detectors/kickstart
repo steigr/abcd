@@ -1,0 +1,29 @@
+#!/bin/bash
+
+add_detector kickstart
+
+detect_kickstart() {
+	FILE="${1}"
+	REQ_MIME_TYPE="text/plain"
+	CHECKSTRING="5"
+	if [ "$(file --mime-type -b "${FILE}")" != "${REQ_MIME_TYPE}" ]; then
+		echo "false"
+	else
+		FOUNDSTRING="$(grep \
+										-e "^auth "	-e "^authconfig " \
+										-e "^bootloader " \
+										-e "^keyboard " \
+										-e "^lang " -e "^langsupport " \
+										-e "^mouse " \
+										-e "^part " -e "^partition " \
+										-e "^rootpw " \
+										-e "^timezone "	\
+										"${FILE}" | wc -l \
+									)"
+		if [ "${FOUNDSTRING}" -ge "${CHECKSTRING}" ]; then
+			echo "true"
+		else
+			echo "false"
+		fi
+	fi
+}

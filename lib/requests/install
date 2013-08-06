@@ -1,0 +1,32 @@
+#!/bin/bash
+
+case "x${PART}" in
+	xkernel)
+		KERNEL=$(find_kernel_image "${FILE_LOCATION}/${OPERATION}/${VARIANT}/${RELEASE}")
+		[[ "x${KERNEL}" != "x" ]] \
+		&& http_get "${KERNEL}" \
+		|| http_error 404
+	;;
+	xinitrd)
+		INITRD=$(find_initrd_image "${FILE_LOCATION}/${OPERATION}/${VARIANT}/${RELEASE}")
+		[[ "x${INITRD}" != "x" ]] \
+		&& http_get "${INITRD}" \
+		|| http_error 404
+	;;
+	xconfiguration)
+		TYPE=$(find_configuration_file "${FILE_LOCATION}/${OPERATION}/${VARIANT}/${RELEASE}")
+		PARSER="${TYPE%,*}"
+		FILE="${TYPE#*,}"
+		. "${LIBEXEC}/${OPERATION}/via-${PARSER}"
+	;;
+	*)
+		if [ -f "${FILE_LOCATION}/${OPERATION}/${VARIANT}/${RELEASE}/${PART}" ]; then
+			TYPE=$(find_configuration_file "${FILE_LOCATION}/${OPERATION}/${VARIANT}/${RELEASE}")
+			PARSER="${TYPE%,*}"
+			FILE="${FILE_LOCATION}/${OPERATION}/${VARIANT}/${RELEASE}/${PART}"
+			. "${LIBEXEC}/${OPERATION}/via-${PARSER}"
+		else
+			http_error 404
+		fi
+	;;
+esac

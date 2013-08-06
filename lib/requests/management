@@ -1,0 +1,15 @@
+#!/bin/bash
+
+case "${VARIANT}" in
+	generic)
+		[[ -f "${LIBEXEC}/${OPERATION}/${VARIANT}" ]] \
+		&& . "${LIBEXEC}/${OPERATION}/${VARIANT}" \
+		|| http_error 501
+	;;
+	*)
+		[[ -f "${LIBEXEC}/${OPERATION}/default" ]] \
+		&& . "${LIBEXEC}/${OPERATION}/default" \
+		|| http_error 501
+	;;
+esac
+		

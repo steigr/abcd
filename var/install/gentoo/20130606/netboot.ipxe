@@ -1,0 +1,5 @@
+#!ipxe
+
+kernel @BASEURL@@KERNEL@ root=/dev/ram0 loop=/image.squashfs init=/linuxrc looptype=squashfs cdroot=1 real_root=/ isoboot=ftp://137.226.34.42/gentoo/releases/amd64/autobuilds/20130606/install-amd64-minimal-20130606.iso autoinstall=@BASEURL@@CONFIGURATION@
+initrd @BASEURL@@INITRD@
+boot

@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+rest_arguments() {
+	name=${1}
+	options=${2}
+	echo "${PATH_INFO}" |  sed -e "s#^.*/${name}/##" | cut -f-${options} -d"/"
+}

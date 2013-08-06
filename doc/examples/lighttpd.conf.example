@@ -1,0 +1,6 @@
+$HTTP["host"] =~ "^boot($|.example.com)" {
+  alias.url = ( "" => "/usr/lib/abcd/server" )
+  $HTTP["url"] =~ "^/" {
+  	cgi.assign = ( "" => "" )
+  }
+}

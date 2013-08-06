@@ -1,0 +1,5 @@
+#!ipxe
+
+kernel @BASEURL@@KERNEL@ archisobasedir=arch archiso_http_srv=http://ftp-stud.hs-esslingen.de/pub/Mirrors/archlinux/iso/2013.05.01/ checksum=y ip=dhcp script=@BASEURL@@CONFIGURATION@
+initrd @BASEURL@@INITRD@
+boot

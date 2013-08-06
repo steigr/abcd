@@ -1,0 +1,5 @@
+#!ipxe
+kernel @BASEURL@@KERNEL@ auto=true priority=critical url=@BASEURL@@CONFIGURATION@ keymap=us
+initrd @BASEURL@@INITRD@
+boot
+

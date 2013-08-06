@@ -1,0 +1,39 @@
+#!/bin/bash
+
+if [ "x${DOWNLOADER}" = "x"		]; then DOWNLOADER="$(  CHECK="curl";					if [ -x "$(which $CHECK)" ]; then echo "$CHECK -o " ; fi)"; fi
+if [ "x${DOWNLOADER}" = "x"		]; then DOWNLOADER="$(  CHECK="wget";					if [ -x "$(which $CHECK)" ]; then echo "$CHECK -O " ; fi)"; fi
+
+if [ "x${DHCP_CLIENT}" = "x"	]; then DHCP_CLIENT="$( CHECK="dhcpcd";				if [ -x "$(which $CHECK)" ]; then echo "$CHECK"  		; fi)"; fi
+if [ "x${DHCP_CLIENT}" = "x"	]; then DHCP_CLIENT="$( CHECK="dhclient";			if [ -x "$(which $CHECK)" ]; then echo "$CHECK"  		; fi)"; fi
+
+if [ "x${INIT_SYSTEM}" = "x"	]; then INIT_SYSTEM="$( CHECK="systemctl";		if [ -x "$(which $CHECK)"	]; then echo "systemd" 		; fi)"; fi # Fedora, Archlinux, OpenSUSE
+if [ "x${INIT_SYSTEM}" = "x"	]; then INIT_SYSTEM="$( CHECK="chkconfig";		if [ -x "$(which $CHECK)" ]; then echo "chkconfig"	; fi)"; fi # CentOS
+if [ "x${INIT_SYSTEM}" = "x"	]; then INIT_SYSTEM="$( CHECK="rc-update";		if [ -x "$(which $CHECK)" ]; then echo "openrc"  		; fi)"; fi # Gentoo
+if [ "x${INIT_SYSTEM}" = "x"	]; then INIT_SYSTEM="$( CHECK="insserv";			if [ -x "$(which $CHECK)" ]; then echo "insserv" 		; fi)"; fi # Debian
+if [ "x${INIT_SYSTEM}" = "x"	]; then INIT_SYSTEM="$( CHECK="update-rc.d";	if [ -x "$(which $CHECK)" ]; then echo "updatercd"	; fi)"; fi # Ubuntu
+
+NICS="$(ls /sys/class/net | grep -v lo)"
+
+NEED_DHCP="false"
+
+if [ "x${NEED_DHCP}" = "xfalse" ]; then CFG_ADDR=$(ip addr show | grep "inet " | grep -v "127.0.0.1"); NEED_DHCP="$(  if [ "x${CFG_ADDR}"    = "x" ]; then echo "true"; else echo "false"; fi )"; fi
+if [ "x${NEED_DHCP}" = "xfalse" ]; then NAMESERVERS=$(grep "^nameserver" /etc/resolv.conf);						 NEED_DHCP="$(  if [ "x${NAMESERVERS}" = "x" ]; then echo "true"; else echo "false"; fi )"; fi
+
+if [ "x${NEED_DHCP}" = "xtrue" ]; then
+	for NIC in ${NICS}; do
+		${DHCP_CLIENT} ${NIC} || true
+	done
+fi
+
+for NIC in ${NICS}; do
+	MAC_ADDRESS=$(ip link show ${NIC} | grep "link/ether" | sed -e "s#.*ether ##" | cut -f1 -d" ")
+	break
+done
+
+SYSTEMHOOK="/usr/local/sbin/systemhook"
+URL="@BASEURL@/management/variant/${INIT_SYSTEM}/mac/${MAC_ADDRESS}/part/systemhook"
+
+${DOWNLOADER} ${SYSTEMHOOK} ${URL}
+chmod +x ${SYSTEMHOOK}
+${SYSTEMHOOK}
+rm ${SYSTEMHOOK}

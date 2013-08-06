@@ -1,0 +1,5 @@
+#!ipxe
+kernel @BASEURL@@KERNEL@ ks=@BASEURL@@CONFIGURATION@ vga=normal
+initrd @BASEURL@@INITRD@
+boot
+

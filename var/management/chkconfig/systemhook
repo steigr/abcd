@@ -1,0 +1,40 @@
+#!/bin/sh
+
+if [ -x /usr/bin/curl ]; then
+	/usr/bin/curl -o /usr/local/sbin/firstboot \
+		@BASEURL@/management/variant/generic/part/firstboot
+fi
+if [ -x /usr/bin/wget ]; then
+	/usr/bin/wget -O /usr/local/sbin/firstboot \
+		@BASEURL@/management/variant/generic/part/firstboot
+fi
+
+chmod +x /usr/local/sbin/firstboot
+
+cat > /etc/init.d/firstboot << 'EOF'
+#!/bin/bash
+#
+#	firstboot	Run finil script
+#
+# chkconfig: 2345  99 01
+# description: Firstboot downloads a script from abcd and runs it
+#
+
+### BEGIN INIT INFO
+# Provides: firstboot
+# Required-Start: $network
+# Required-Stop: $network
+# Default-Start: 2 3 4 5
+# Default-Stop: 0 1 6
+# Short-Description: A script that runs once
+# Description: A script that runs once
+### END INIT INFO
+/sbin/chkconfig --del firstboot || /sbin/chkconfig --del --force firstboot
+rm /etc/init.d/firstboot
+cd /tmp
+/usr/bin/nohup bash /usr/local/sbin/firstboot &
+EOF
+
+chmod +x /etc/init.d/firstboot
+
+/sbin/chkconfig --add firstboot || /sbin/chkconfig --add --force firstboot

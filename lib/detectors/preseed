@@ -1,0 +1,19 @@
+#!/bin/bash
+
+add_detector preseed
+
+detect_preseed() {
+	FILE="${1}"
+	MIME_TYPE="text/plain"
+	CHECKSTRING="10"
+	if [ "$(file --mime-type -b "${FILE}")" != "${MIME_TYPE}" ]; then
+		echo "false"
+	else
+		FOUNDSTRING="$(grep -e "^\s*d-i " "${FILE}" | wc -l)"
+		if [ "${FOUNDSTRING}" -ge "${CHECKSTRING}" ]; then
+			echo "true"
+		else
+			echo "false"
+		fi
+	fi
+}

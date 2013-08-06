@@ -1,0 +1,13 @@
+#!/bin/bash
+
+WC=$(create_working_copy "${FILE}")
+
+insert_postinstall_script "${WC}"
+
+PLACEHOLDERS=$(get_placeholders ${WC})
+for placeholder in ${PLACEHOLDERS}; do
+	process_placeholder "${WC}" "${placeholder}"
+done
+http_get "${WC}"
+rm "${WC}"
+abcd_logger "send install/${VARIANT}/${RELEASE}/${PART}"

@@ -1,0 +1,19 @@
+#!/bin/bash
+
+case "$PART" in
+	systemhook)
+		WC=$(create_working_copy "${FILE_LOCATION}/management/${VARIANT}/${PART}")
+		sed -i ':a;N;$!ba;s/\\\n/ /g' ${WC}
+		PLACEHOLDERS=$(get_placeholders ${WC})
+		for placeholder in ${PLACEHOLDERS}; do
+			process_placeholder "${WC}" "${placeholder}"
+		done
+		http_get "${WC}"
+		rm "${WC}"
+		disable_netboot $MAC
+		abcd_logger "send management/${VARIANT}/${PART}"
+	;;
+	*)
+		http_error 501
+	;;
+esac

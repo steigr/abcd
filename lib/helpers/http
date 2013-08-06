@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+
+http_header() {
+	HEADER=${1}
+	VALUE=${2}
+	case "${HEADER}" in
+		finish)
+			echo -ne "\n"
+		;;
+		*)
+			echo "${HEADER}: ${VALUE}"
+		;;
+	esac
+}
+
+http_error() {
+	state404="Not found"
+	state501="Not implemented"
+	state200="OK"
+	http_header Status "${1} $(eval echo \$state$1)"
+	http_header Content-Type "text/html"
+	http_header finish
+	echo "${1} $(eval echo \$state$1)"
+}
+
+http_get() {
+	if [ -d "${1}" ]; then
+		data=$(ls ${1})
+		http_header Content-Type text/plain
+		http_header Content-Length "$(echo -e "${data}" | wc -c)"
+		http_header finish
+		echo -e "${data}"
+	else
+		http_header Content-Type application/octet-stream
+		http_header Content-Length $(du -sb "${1}" | awk '{print $1}')
+		http_header finish
+		cat "${1}" || true
+	fi
+}

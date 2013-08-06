@@ -1,0 +1,51 @@
+#!/bin/bash
+
+autoyast_create_chroot_script_hook() {
+	FILE="${1}"
+	HAS_SCRIPT_TAG="$( [[ "$( grep "<scripts" "${FILE}" | wc -l )" -ge "1" ]] && echo "true" || echo "false")"
+	HAS_CHROOT_SCRIPT_TAG="$( [[ "$( grep "<chroot-scripts" "${FILE}" | wc -l )" -ge "1" ]] && echo "true" || echo "false")"
+	if [ "x${HAS_SCRIPT_TAG}" = "xtrue" ]; then
+		if [ "x${HAS_CHROOT_SCRIPT_TAG}" = "xtrue" ]; then
+			sed -i -e 's#</chroot-scripts>#@EMBEDSCRIPT@\n</chroot-scripts>#' "${FILE}"
+		else
+			sed -i -e 's#</scripts>#<chroot-scripts config:type="list">\n@EMBEDSCRIPT@\n</chroot-scripts>\n</scripts>\n#' "${FILE}"
+		fi
+	else
+		sed -i -e 's#</profile>#<scripts>\n<chroot-scripts config:type="list">\n@EMBEDSCRIPT@\n</chroot-scripts>\n</scripts>\n</profile>#' "${FILE}"
+	fi
+}
+
+autoyast_insert_script_plate() {
+	FILE="${WC}"
+	CHROOT_HOOK_SCRIPT=$(create_working_copy "/dev/null")
+cat <<'EOCHROOTHOOK' >"${CHROOT_HOOK_SCRIPT}"
+			<script>
+				<source><![CDATA[
+@POSTINSTALL@
+]]>
+				</source>
+				<chrooted config:type="boolean">true</chrooted>
+				<interpreter>shell</interpreter>
+				<filename>postinstall.sh</filename>
+				<feedback config:type="boolean">false</feedback>
+				<debug config:type="boolean">true</debug>
+			</script>
+EOCHROOTHOOK
+	sed -i "/^@EMBEDSCRIPT@$/ r ${CHROOT_HOOK_SCRIPT}" "${FILE}"
+	sed -i "/^@EMBEDSCRIPT@$/d" "${FILE}"
+	rm "${CHROOT_HOOK_SCRIPT}"
+}
+
+WC=$(create_working_copy "${FILE}")
+remove_escaped_newlines "${WC}"
+remove_comment_lines "${WC}"
+autoyast_create_chroot_script_hook "${WC}"
+autoyast_insert_script_plate "${WC}"
+insert_postinstall_script "${WC}"
+PLACEHOLDERS=$(get_placeholders ${WC})
+for placeholder in ${PLACEHOLDERS}; do
+	process_placeholder "${WC}" "${placeholder}"
+done
+http_get "${WC}"
+rm "${WC}"
+abcd_logger "send install/${VARIANT}/${RELEASE}/${PART}"

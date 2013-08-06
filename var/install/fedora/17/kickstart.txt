@@ -1,0 +1,22 @@
+autopart
+authconfig --useshadow --enablemd5
+bootloader
+clearpart --all --initlabel
+firewall --disabled
+firstboot --disable 
+install
+url --url http://ftp-stud.fht-esslingen.de/pub/Mirrors/fedora/linux/releases/17/Fedora/x86_64/os
+lang en_US.UTF-8
+keyboard us
+network --bootproto=dhcp --device=eth0
+reboot
+rootpw @ROOTPASSWORD@
+selinux --disabled
+skipx
+text
+timezone --utc UTC
+zerombr
+%packages --excludedocs
+openssh-server
+@core
+%end

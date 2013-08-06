@@ -1,0 +1,9 @@
+# OpenSUSE
+opensuse/11.4/linux=http://ftp.halifax.rwth-aachen.de/opensuse/distribution/11.4/repo/oss/boot/x86_64/loader/linux
+opensuse/11.4/initrd=http://ftp.halifax.rwth-aachen.de/opensuse/distribution/11.4/repo/oss/boot/x86_64/loader/initrd
+opensuse/12.1/linux=http://ftp.halifax.rwth-aachen.de/opensuse/distribution/12.1/repo/oss/boot/x86_64/loader/linux
+opensuse/12.1/initrd=http://ftp.halifax.rwth-aachen.de/opensuse/distribution/12.1/repo/oss/boot/x86_64/loader/initrd
+opensuse/12.2/linux=http://ftp.halifax.rwth-aachen.de/opensuse/distribution/12.2/repo/oss/boot/x86_64/loader/linux
+opensuse/12.2/initrd=http://ftp.halifax.rwth-aachen.de/opensuse/distribution/12.2/repo/oss/boot/x86_64/loader/initrd
+opensuse/12.3/linux=http://ftp.halifax.rwth-aachen.de/opensuse/distribution/12.3/repo/oss/boot/x86_64/loader/linux
+opensuse/12.3/initrd=http://ftp.halifax.rwth-aachen.de/opensuse/distribution/12.3/repo/oss/boot/x86_64/loader/initrd

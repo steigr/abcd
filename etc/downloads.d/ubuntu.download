@@ -1,0 +1,15 @@
+# Ubuntu
+ubuntu/saucy/linux=http://de.archive.ubuntu.com/ubuntu/dists/saucy/main/installer-amd64/current/images/netboot/ubuntu-installer/amd64/linux
+ubuntu/saucy/initrd.gz=http://de.archive.ubuntu.com/ubuntu/dists/saucy/main/installer-amd64/current/images/netboot/ubuntu-installer/amd64/initrd.gz
+ubuntu/raring/linux=http://de.archive.ubuntu.com/ubuntu/dists/raring/main/installer-amd64/current/images/netboot/ubuntu-installer/amd64/linux
+ubuntu/raring/initrd.gz=http://de.archive.ubuntu.com/ubuntu/dists/raring/main/installer-amd64/current/images/netboot/ubuntu-installer/amd64/initrd.gz
+ubuntu/quantal/linux=http://de.archive.ubuntu.com/ubuntu/dists/quantal/main/installer-amd64/current/images/netboot/ubuntu-installer/amd64/linux
+ubuntu/quantal/initrd.gz=http://de.archive.ubuntu.com/ubuntu/dists/quantal/main/installer-amd64/current/images/netboot/ubuntu-installer/amd64/initrd.gz
+ubuntu/precise/linux=http://de.archive.ubuntu.com/ubuntu/dists/precise/main/installer-amd64/current/images/netboot/ubuntu-installer/amd64/linux
+ubuntu/precise/initrd.gz=http://de.archive.ubuntu.com/ubuntu/dists/precise/main/installer-amd64/current/images/netboot/ubuntu-installer/amd64/initrd.gz
+ubuntu/oneiric/linux=http://de.archive.ubuntu.com/ubuntu/dists/oneiric/main/installer-amd64/current/images/netboot/ubuntu-installer/amd64/linux
+ubuntu/oneiric/initrd.gz=http://de.archive.ubuntu.com/ubuntu/dists/oneiric/main/installer-amd64/current/images/netboot/ubuntu-installer/amd64/initrd.gz
+ubuntu/lucid/linux=http://de.archive.ubuntu.com/ubuntu/dists/lucid/main/installer-amd64/current/images/netboot/ubuntu-installer/amd64/linux
+ubuntu/lucid/initrd.gz=http://de.archive.ubuntu.com/ubuntu/dists/lucid/main/installer-amd64/current/images/netboot/ubuntu-installer/amd64/initrd.gz
+ubuntu/hardy/linux=http://de.archive.ubuntu.com/ubuntu/dists/hardy/main/installer-amd64/current/images/netboot/ubuntu-installer/amd64/linux
+ubuntu/hardy/initrd.gz=http://de.archive.ubuntu.com/ubuntu/dists/hardy/main/installer-amd64/current/images/netboot/ubuntu-installer/amd64/initrd.gz

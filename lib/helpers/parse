@@ -1,0 +1,104 @@
+#!/usr/bin/env bash
+
+get_placeholders() {
+	INPUTFILE=${1}
+	echo $(cat "${INPUTFILE}" | sed -e "s#@#\n@#g" | grep -E "^@[A-Z_]+" | sort | uniq | cut -f2 -d@)
+}
+
+process_placeholder() {
+	FILE=${1}
+	PLACEHOLDER=${2}
+	ARG_VALUE=${3}
+	CFG_VALUE=$(eval $(grep -E "^\s*${PLACEHOLDER}" /etc/netboot/config ); echo ${!PLACEHOLDER})
+	ENV_VALUE=${!PLACEHOLDER}
+	if [ "x${ARG_VALUE}" != "x" ]; then
+		VALUE=${ARG_VALUE}
+	else
+		if [ "x${CFG_VALUE}" != "x" ]; then
+			VALUE=${CFG_VALUE}
+		else
+			if [ "x${ENV_VALUE}" != "x" ]; then
+				VALUE=${ENV_VALUE}
+			else
+				VALUE="@${PLACEHOLDER}@"
+			fi
+		fi
+	fi
+	sed -i -e "s#@${PLACEHOLDER}@#${VALUE}#g" ${FILE}
+}
+
+create_working_copy() {
+	FILE=${1}
+	TMP=/tmp/$(date +%s%N)
+	cp "${FILE}" "${TMP}"
+	echo "${TMP}"
+}
+
+remove_escaped_newlines() {
+	sed -i ':a;N;$!ba;s/\\\n/ /g' "${1}"
+}
+
+remove_comment_lines() {
+	cat "${1}" | grep -v -e "^#" -e "^$" > "${1}1" && mv "${1}1" "${1}"
+}
+
+find_configuration_file() {
+	SEARCH_DIR="${1}"
+	TEST_FILES="$(find "${SEARCH_DIR}" -type f | xargs -n1 file --mime-type | grep -e "application/xml" -e "text/" | rev | cut -f2- -d":" | rev)"
+	for TEST_FILE in $TEST_FILES; do
+		TYPE=''
+		for DETECTOR in $DETECTORS; do 
+			if [ "x$(detect_${DETECTOR} "${TEST_FILE}")" = "xtrue" ]; then
+				TYPE="${DETECTOR},${TEST_FILE}"
+			fi
+			if [ "x${TYPE}" != "x" ]; then
+				break 2
+			fi
+		done	
+	done
+	echo "${TYPE}"
+}
+
+find_kernel_image() {
+	SEARCH_DIR="${1}"
+	echo "$(ls -c $(find "${SEARCH_DIR}" -type f \
+									| xargs -n1 file \
+									| grep -i \
+										-e kernel \
+										-e vmlinu \
+									| awk -F": " '{print $1}') \
+									| head -n1)"
+}
+
+find_initrd_image() {
+	SEARCH_DIR="${1}"
+	BY_TYPE="$(find "${SEARCH_DIR}" -type f \
+							| xargs -n1 file \
+							| grep -i \
+								-e initrd \
+								-e "xz compressed data" \
+								-e "gzip compressed data" \
+								-e "lzma compressed data" \
+							| awk -F": " '{print $1 }' \
+							| xargs ls -c \
+							| head -n1 )"
+	[[ "x${BY_TYPE}" != "x" ]] \
+	&& ( echo "${BY_TYPE}"; return )
+}
+
+add_detector() {
+	DETECTOR="${1}"
+	export DETECTORS="$(echo -e "${DETECTORS} ${DETECTOR}" | sed -e "s# #\n#g" | sort | uniq)"
+}
+
+load_detectors() {
+	for DFILE in $(find "${LIBEXEC}/detectors" -type f); do
+		. ${DFILE}
+	done
+}
+
+insert_postinstall_script() {
+	FILE="${1}"
+	sed -i "/@POSTINSTALL@/ r ${POSTINSTALL}" "${FILE}"
+	sed -i "/^@POSTINSTALL@$/d" "${FILE}"
+}

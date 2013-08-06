@@ -1,0 +1,5 @@
+#!ipxe
+kernel @BASEURL@@KERNEL@ ks=@BASEURL@@CONFIGURATION@ method=http://ftp-stud.fht-esslingen.de/pub/Mirrors/centos/6.4/os/x86_64
+initrd @BASEURL@@INITRD@
+boot
+

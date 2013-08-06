@@ -1,0 +1,64 @@
+#!/usr/bin/env bash
+
+netboot_is_active() {
+  MAC=$(echo "${1}" | tr "[:upper:]" "[:lower:]")
+  is_active=false
+	if [ "x$(grep "${MAC}=" "${NETBOOT_CLIENTS}")" = "x" ]; then
+		if [ "x${DEFAULT_DEPLOYMENT}" = "x" ]; then
+  	  DEPLOY="unkown/unkown"
+			echo "# ${MAC}=unknown/unknown" >> "${NETBOOT_CLIENTS}"
+			return
+		else
+			if [ "x${DEFAULT_DEPLOYMENT_ENABLED}" = "xtrue" ]; then
+				echo "${MAC}=${DEFAULT_DEPLOYMENT}" >> "${NETBOOT_CLIENTS}"
+			else
+				echo "# ${MAC}=${DEFAULT_DEPLOYMENT}" >> "${NETBOOT_CLIENTS}"
+				return
+			fi
+		fi
+	fi
+  cat "${NETBOOT_CLIENTS}" | grep -v "^#" | while read entry; do
+    TESTMAC=$(echo ${entry} | cut -f1 -d"#" | tr "[:upper:]" "[:lower:]" | tr -d ' ' | cut -f1 -d"=")
+    if [ "x${MAC}" = "x$TESTMAC" ]; then
+			OS_STRING=$(echo ${entry} | cut -f1 -d"#" | tr "[:upper:]" "[:lower:]" | tr -d ' ' | cut -f2 -d"=" | cut -f1 -d"#")
+      echo true,${OS_STRING}
+    fi 
+  done
+}
+
+disable_netboot() {
+  MAC=$1
+  if [ "x$MAC" != "x" ]; then
+    TMP=/tmp/$$.nb
+    line=$(grep -i ^$MAC $NETBOOT_CLIENTS)
+    if [ "x$line" != "x" ]; then
+      grep -v -i "^$MAC" $NETBOOT_CLIENTS > $TMP
+      echo "# $line" >> $TMP
+      cat $TMP > $NETBOOT_CLIENTS
+      rm $TMP
+    fi
+    $LOGGER "Netboot for $MAC disabled"
+  fi
+}
+
+get_netboot_by_mac() {
+	MAC="$(echo $1 | sed -e 's#${net0#invalid#')"
+	case "x$MAC" in
+		xinvalid|x)
+			echo "RESPONSE=binary"
+		;;
+		*)
+			NETBOOT=$(netboot_is_active $MAC)
+			NETBOOT_FILE=$(netboot_is_active $MAC | cut -f2- -d",")
+			case "x${NETBOOT%,*}" in
+				xtrue)
+					echo "NETBOOT_FILE=${NETBOOT#*,}"
+					echo "RESPONSE=netboot"
+				;;
+				*)
+					echo "RESPONSE=hdboot"
+				;;
+			esac
+		;;
+	esac
+}

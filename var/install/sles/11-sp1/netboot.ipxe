@@ -1,0 +1,5 @@
+#!ipxe
+kernel @BASEURL@@KERNEL@ install=http://sles-server.zih.tu-dresden.de/Sles11-SP1-64/CD1/ autoyast=@BASEURL@@CONFIGURATION@
+initrd @BASEURL@@INITRD@
+boot
+

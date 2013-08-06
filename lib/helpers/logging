@@ -1,0 +1,8 @@
+#!/bin/bash
+
+abcd_logger() {
+	[[ "${HTTP_X_FORWARDED_FOR}" ]] && REMOTE_ADDR=${HTTP_X_FORWARDED_FOR}
+	IS_IP=$(echo ${REMOTE_ADDR} | sed 's/[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}/true/' ) 
+	[[ "${IS_IP}" != "true" ]] && REMOTE_ADDR=$(host ${REMOTE_ADDR} | rev | cut -f1 -d" " | rev)
+	logger -t "abcd" "${REMOTE_ADDR} ${1}"
+}

@@ -1,0 +1,122 @@
+#!/bin/bash
+
+set -e
+#set -x
+
+TMP_ISO=/tmp/$$.iso
+TMP_DIR=/tmp/$$.loop
+DOWNLOAD_TRACK=/tmp/abcd-download.track
+mkdir -p $TMP_DIR
+touch $DOWNLOAD_TRACK
+
+[[ -f "/etc/abcd/config" ]] \
+&& . /etc/abcd/config
+
+cat /etc/abcd/downloads.downloads /etc/abcd/downloads.d/*.download 2>/dev/null | grep -v -e "^$" -e "^#" | while read line; do
+	REMOTE_PATH=$(echo "${line}" | cut -f2- -d"=")
+	if [ "$(basename $REMOTE_PATH | rev | cut -f1 -d"." | rev)" = "iso" ]; then
+		JUST_DOWNLOADED=$(cat $DOWNLOAD_TRACK)
+		LOOP_PATH="${TMP_DIR}/$(echo "${line}" | cut -f1 -d"=" | cut -f2 -d:)"
+		LOCAL_PATH="${FILE_LOCATION}/install/$(echo "${line}" | cut -f1 -d"=" | cut -f3 -d:)"
+		if [ ! -e "${LOCAL_PATH}" ]; then
+			echo "${REMOTE_PATH} M+-> ${LOCAL_PATH}"
+			if [ "${JUST_DOWNLOADED}" != "${REMOTE_PATH}" ]; then
+				[[ "$(mount | grep "${TMP_DIR}")" ]] && umount $TMP_DIR
+				[[ -f "${TMP_ISO}" ]] && rm $TMP_ISO
+				wget -q -O $TMP_ISO "${REMOTE_PATH}"
+				mount -o loop,ro $TMP_ISO $TMP_DIR
+				echo "${REMOTE_PATH}" > $DOWNLOAD_TRACK
+			fi
+			mkdir -p "$(dirname "${LOCAL_PATH}")"
+			cp "${LOOP_PATH}" "${LOCAL_PATH}"
+		fi
+	else
+		LOCAL_PATH="${FILE_LOCATION}/install/$(echo "${line}" | cut -f1 -d"=")"
+		[[ -e "${LOCAL_PATH}" ]] \
+		|| ( \
+			echo "${REMOTE_PATH} -> ${LOCAL_PATH}"; \
+			mkdir -p "$(dirname "${LOCAL_PATH}")"; \
+			wget -q -O "${LOCAL_PATH}" "${REMOTE_PATH}" \
+		)
+	fi
+done
+[[ "$(mount | grep "${TMP_DIR}")" ]] && umount $TMP_DIR
+[[ -f "${TMP_ISO}" ]] && rm $TMP_ISO
+rm -r $TMP_DIR || true
+rm $DOWNLOAD_TRACK || true
+
+. "${LIBEXEC}/helpers/parse" 
+
+extract_initrd() {
+	DIR=${1}
+	FILE=${2}
+	mkdir -p "${DIR}"
+	cd "${DIR}"
+	FORMAT=$(file -b "${FILE}" | cut -f1 -d" ")
+	mkdir -p "${DIR}"
+	cd "${DIR}"
+	case "${FORMAT}" in
+		gzip)
+			zcat "${FILE}" | cpio -id
+		;;
+		XZ)
+			xzcat "${FILE}" | cpio -id
+		;;
+	esac
+	echo "${FORMAT}"
+}
+
+compress_initrd() {
+	DIR=${1}
+	FILE=${2}
+	FORMAT=${3}
+	cd "${DIR}"
+	case ${FORMAT} in
+		XZ)
+			find . -print | cpio -o -H newc | xz -9 -c --format=lzma - > "${FILE}"
+		;;
+		gzip)
+			find . -print | cpio -o -H newc | gzip -9 -c - > "${FILE}"
+		;;
+	esac
+}
+
+patch_initrd_dir() {
+	DIR="${1}"
+	PATCH="${2}"
+	patch -f --dry-run -p1 -d "${DIR}" < "${PATCH}" >/dev/null && ( patch -f -p1 -d "${DIR}" < "${PATCH}" >/dev/null; echo "true" ) || ( true; echo "false" )
+}
+
+patch_initrd() {
+	INITRD="${1}"
+	PATCH="${2}"
+	JOBS="${3}"
+	TMP=/tmp/initrd.$$
+	FORMAT=$(extract_initrd "${TMP}" "${INITRD}")
+	PATCHED=$(patch_initrd_dir "${TMP}" "${PATCH}")
+	[[ "x${PATCHED}" = "xtrue" ]] && ( \
+		for JOB in $JOBS; do
+			eval $($JOB)
+		done
+		compress_initrd "${TMP}" "${TMP}.initrd" "${FORMAT}"; \
+		mv "${TMP}.initrd" "${INITRD}"; \
+	) || echo "Patch already applied"
+	cd /tmp
+	rm -rf "${TMP}"
+	
+}
+
+patch_gentoo_dns() {
+  cp /lib/x86_64-linux-gnu/libnss_dns* "${TMP}/lib"
+	cp /lib/x86_64-linux-gnu/libresolv*  "${TMP}/lib"
+}
+
+patch_gentoo() {
+	find "${FILE_LOCATION}/install/gentoo" -mindepth 1 -maxdepth 1 -type d | while read grelease; do
+		INITRD_FILE=$(find_initrd_image $grelease)
+		echo "Patching $INITRD_FILE" 
+		patch_initrd "${INITRD_FILE}" "${FILE_LOCATION}/patches/gentoolinux-initrd.patch" "patch_gentoo_dns"
+	done
+}
+
+patch_gentoo

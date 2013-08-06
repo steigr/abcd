@@ -1,0 +1,14 @@
+#/bin/bash
+
+add_detector shellscript
+
+detect_shellscript() {
+	FILE="${1}"
+	MIME_TYPE="text/x-shellscript"
+	if [ "$(file --mime-type -b "${FILE}" )" = "${MIME_TYPE}" ]; then
+		echo "true"
+	else
+		echo "false"
+	fi
+}
+

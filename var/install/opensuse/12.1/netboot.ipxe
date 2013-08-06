@@ -1,0 +1,5 @@
+#!ipxe
+kernel @BASEURL@@KERNEL@ install=http://ftp.uni-erlangen.de/pub/mirrors/opensuse/distribution/12.1/repo/oss/ autoyast=@BASEURL@@CONFIGURATION@
+initrd @BASEURL@@INITRD@
+boot
+

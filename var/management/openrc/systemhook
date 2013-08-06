@@ -1,0 +1,22 @@
+#!/bin/bash
+SCRIPT=/etc/local.d/firstboot.start
+cat > $SCRIPT <<'EOSCRIPT'
+#!/bin/bash
+echo -e "\nStarting Firstboot-Script" > /dev/tty1
+if [ -x /usr/bin/curl ]; then
+	DOWNLOADER="/usr/bin/curl -o /usr/local/sbin/firstboot "
+fi
+if [ -x /usr/bin/wget ]; then
+	DOWNLOADER="/usr/bin/wget -O /usr/local/sbin/firstboot "
+fi
+
+$DOWNLOADER @BASEURL@/management/variant/generic/part/firstboot
+chmod +x /usr/local/sbin/firstboot
+cd /var/tmp
+echo -e "\nAbout to run firstboot-script" >/dev/tty1
+rm /etc/local.d/firstboot.start
+/usr/local/sbin/firstboot
+EOSCRIPT
+
+chmod +x $SCRIPT
+

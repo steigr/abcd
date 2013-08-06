@@ -1,0 +1,19 @@
+#!/bin/bash
+
+add_detector autoyast
+
+detect_autoyast() {
+	FILE=${1}
+	CHECKSTRING="http://www.suse.com/1.0/yast2ns"
+	MIME_TYPE="application/xml"
+	if [ "$(file --mime-type -b "${FILE}")" != "${MIME_TYPE}" ]; then
+		echo "false"
+	else
+		FOUNDSTRING=$(grep "<profile" "${FILE}" | awk -F"xmlns=\"" '{ print $2 }' | cut -f1 -d\")
+		if [ "x${CHECKSTRING}" = "x${FOUNDSTRING}" ]; then
+			echo "true"
+		else
+			echo "false"
+		fi
+	fi
+}

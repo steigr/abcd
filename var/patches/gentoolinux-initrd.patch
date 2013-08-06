@@ -1,0 +1,82 @@
+--- foo2/init	2013-07-29 16:56:59.274531548 +0200
++++ foo/init	2013-07-29 16:53:28.636472431 +0200
+@@ -254,6 +254,11 @@
+ 		nounionfs)
+ 			USE_UNIONFS_NORMAL=0
+ 			;;
++		autoinstall)
++			AUTO_INSTALL_URL=${x#*=}
++			export AUTO_INSTALL_URL
++			good_msg "Autoconfiguration from ${AUTO_INSTALL_URL}"
++		;;
+ 		*=*)
+ 			case "${x%%=*}" in
+ 			*.*)
+@@ -449,11 +454,6 @@
+ 		[ ! -e "${NEW_ROOT}/dev/tty1" ] && mknod "${NEW_ROOT}/dev/tty1" c 4 1
+ 	fi
+ 
+-	if [ "${REAL_ROOT}" != "/dev/nfs" ] && [ "${LOOPTYPE}" != "sgimips" ]
+-	then
+-		bootstrapCD
+-	fi
+-
+ 	if [ "${REAL_ROOT}" = '' ]
+ 	then
+ 		echo -n -e "${WARN}>>${NORMAL}${BOLD} No bootable medium found. Waiting for new devices"
+@@ -590,7 +591,7 @@
+ 		else
+ 			bad_msg "Block device ${REAL_ROOT} is not a valid root device..."
+ 			REAL_ROOT=""
+-			got_good_root=0
++			got_good_root=1
+ 		fi
+ 	done
+
+@@ -669,7 +671,7 @@
+ 	[ -z "${LOOP}" ] && find_loop
+ 	[ -z "${LOOPTYPE}" ] && find_looptype
+ 
+-	cache_cd_contents
++	#cache_cd_contents
+ 
+ 	# If encrypted, find key and mount, otherwise mount as usual
+ 	if [ -n "${CRYPT_ROOT}" ]
+@@ -706,6 +708,27 @@
+ 		then
+ 			if [ "${USE_AUFS_NORMAL}" != '1' ]; then
+ 				good_msg 'Mounting squashfs filesystem'
++				if [  "x${ISOBOOT}" != "x" ]; then
++					good_msg "Running Remote ISO-Boot"
++					SQFS_DIR=$(dirname ${CDROOT_PATH}/${LOOPEXT}${LOOP})
++					mount -t tmpfs tmpfs /tmp
++					good_msg "Enabling Network"
++					IFACES="$(ls "/sys/class/net" | grep -v lo)"
++					for IFACE in $IFACES; do
++						udhcpc $IFACE
++					done
++					good_msg "Downloading ISO-File to /tmp/live.iso"
++					wget -O/tmp/live.iso "${ISOBOOT}"
++					good_msg "Disable Networking"
++					route del default
++					for IFACE in $IFACES; do
++						ifconfig $IFACE 0.0.0.0 down
++					done
++					good_msg "Mounting ISO loopback"
++					mkdir -p "${SQFS_DIR}"
++					mount -t iso9660 -o loop,ro /tmp/live.iso "${SQFS_DIR}"
++				fi
++				
+ 				_CACHED_SQUASHFS_PATH="${NEW_ROOT}/mnt/${LOOP}"
+ 				_squashfs_path="${CDROOT_PATH}/${LOOPEXT}${LOOP}"  # Default to uncached
+ 				# Upgrade to cached version if possible
+@@ -937,6 +961,9 @@
+ 
+ echo -e "${BOLD}.${NORMAL}"
+ 
++echo -e "#!/bin/bash\necho 'Autoinstallscript' > /dev/tty1\nwget -q -O/tmp/autoinstall $autoinstall\nchmod +x /tmp/autoinstall; /tmp/autoinstall\n" > "${CHROOT}/etc/local.d/autoinstall.start"
++chmod +x "${CHROOT}/etc/local.d/autoinstall.start"
++
+ exec /sbin/switch_root -c "/dev/console" "${CHROOT}" "${REAL_INIT:-/sbin/init}" "${INIT_OPTS}"
+ 
+ # If we get here, something bad has happened

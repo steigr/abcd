@@ -1,0 +1,49 @@
+#!/bin/bash
+
+ipxe_send_binary() {
+	http_get "${FILE_LOCATION}/boot/ipxe/binary"
+	abcd_logger "send ipxe/binary"
+}
+
+ipxe_send_netboot() {
+	OS_VARIANT=$(echo ${FILE} | cut -f1 -d"/")
+	OS_RELEASE=$(echo ${FILE} | cut -f2- -d"/")
+	WC=$(create_working_copy "$FILE_LOCATION/install/$OS_VARIANT/$OS_RELEASE/netboot.ipxe")
+	KERNEL="/install/variant/$OS_VARIANT/release/$OS_RELEASE/part/kernel"
+	INITRD="/install/variant/$OS_VARIANT/release/$OS_RELEASE/part/initrd"
+	CONFIGURATION="/install/variant/$OS_VARIANT/release/$OS_RELEASE/part/configuration"
+	PLACEHOLDERS=$(get_placeholders ${WC})
+	for placeholder in ${PLACEHOLDERS}; do
+		process_placeholder "${WC}" "${placeholder}"
+	done
+	http_get "${WC}"
+	rm "${WC}"
+	abcd_logger "send install/${OS_VARIANT}/${OS_RELEASE}/netboot.ipxe"
+}
+
+ipxe_send_hdboot() {
+	hdboot='#!ipxe\nexit'
+	http_header Content-Type		application/x-ipxe-script
+	http_header Content-Length	$(echo -e "$hdboot" | wc -c)
+	http_header finish
+	echo -e "$hdboot"
+	abcd_logger "send ipxe/hdboot"
+}
+
+
+RESPONSE=binary
+if [ "x$PART" = "xscript" ]; then
+	eval $(get_netboot_by_mac ${MAC})
+fi
+
+case "$RESPONSE" in
+	binary)
+		ipxe_send_binary
+	;;
+	netboot)
+		FILE=$NETBOOT_FILE ipxe_send_netboot
+	;;
+	hdboot)
+		ipxe_send_hdboot
+	;;
+esac

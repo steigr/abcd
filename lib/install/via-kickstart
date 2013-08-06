@@ -1,0 +1,32 @@
+#!/bin/bash
+
+kickstart_with_end() {
+	FILE="${1}"
+	if [ "x$(grep "%end" "${FILE}")" = "x" ]; then
+		echo "false"
+	else
+		echo "true"
+	fi
+}
+
+kickstart_insert_script_plate() {
+	FILE="${WC}"
+	cat <<'EOLATECOMMAND' >> "${FILE}"
+%post
+@POSTINSTALL@
+EOLATECOMMAND
+	if [ "x$(kickstart_with_end "${FILE}")" = "xtrue" ]; then
+		echo '%end' >> "${FILE}"
+	fi
+}
+
+WC=$(create_working_copy "${FILE}")
+kickstart_insert_script_plate "${WC}"
+insert_postinstall_script "${WC}"
+PLACEHOLDERS=$(get_placeholders ${WC})
+for placeholder in ${PLACEHOLDERS}; do
+	process_placeholder "${WC}" "${placeholder}"
+done
+http_get "${WC}"
+rm "${WC}"
+abcd_logger "send install/${VARIANT}/${RELEASE}/${PART}"
