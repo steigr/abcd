@@ -60,9 +60,11 @@ install_tf2httpd() {
 }
 
 install_abcd() {
-  
+  test -e /etc/abcd || rm -rf /etc/abcd
   mkdir /etc/abcd
+  test -e /usr/lib/abcd || rm -rf /usr/lib/abcd
   mkdir /usr/lib/abcd
+  test -e /var/lib/abcd || rm -rf /var/lib/abcd
   mkdir /var/lib/abcd
   
   cp sbin/abcd-downloader /usr/sbin/abcd-downloader
@@ -85,20 +87,22 @@ install_ipxe() {
   read ANSWER
   case "$ANSWER" in
     y)
-      apt-get install -y make gcc
-      git clone git://git.ipxe.org/ipxe.git /tmp/ipxe
-      CAT << 'IPXE_BOOT_SCRIPT' >/tmp/ipxe/default-script
+      apt-get install -y make gcc binutils zlib1g-dev syslinux
+      IPXETMP=/tmp/ipxe.$$
+      git clone git://git.ipxe.org/ipxe.git $IPXETMP
+      cat << 'IPXE_BOOT_SCRIPT' >$IPXETMP/default-script
 #!ipxe
 prompt --key 0x02 --timeout 2000 Press Ctrl-B for the iPXE command line... && shell ||
 dhcp
 imgload tftp://${next-server}/${filename}
 boot
 IPXE_BOOT_SCRIPT
-      cd /tmp/ipxe/src
+      cd $IPXETMP/src
       cp config/*.h config/local
-      make EMBED=/tmp/ipxe/default-script bin/undionly.kpxe
+      make EMBED=$IPXETMP/default-script bin/undionly.kpxe
       mkdir -p /var/lib/abcd/boot/ipxe
       cp bin/undionly.kpxe /var/lib/abcd/boot/ipxe/binary
+      rm -rf $IPXETMP
     ;;
     *)
       echo 'Not installing. Please use ipxe (or gpxe) into /var/lib/abcd/boot/$PXE_FLAVOUR/binary. Netboot-Scripts will be named netboot.$PXE_FLAVOUR'
