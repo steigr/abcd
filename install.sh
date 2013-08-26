@@ -30,12 +30,22 @@ get_domainname() {
 
 
 install_packages() {
-  apt-get update -q >~/abcd-installer-$$.log 2>~/abcd-installer-$$.err
-  apt-get install -y -q bind9 isc-dhcp-server lighttpd bind9-host python-dnspython python-daemon >~/abcd-installer-$$.log 2>~/abcd-installer-$$.err
+  apt-get update -q
+  apt-get install -y -q bind9 isc-dhcp-server lighttpd bind9-host python-dnspython python-daemon
 }
 
 configure_lighttpd() {
-  cat doc/examples/lighttpd.conf.example | sed -e "s/example\.com/${DOMAINNAME}/" > /etc/lighttpd/conf-availabe/60-abcd.conf
+  cat <<'EOF_LIGHTTPD_CONF' >/etc/lighttpd/conf-available/60-abcd.conf
+$HTTP["host"] =~ "^@($|.@@)" {
+  alias.url = ( "" => "/usr/lib/abcd/server" )
+  $HTTP["url"] =~ "^/" {
+    cgi.assign = "( "" => "" )
+  }
+}
+EOF_LIGHTTPD_CONF
+  sed -i -e "s#@@#$DOMAINNAME" \
+         -e "s#@#$HOSTNAME#" \
+    /etc/lighttpd/conf-available/60-abcd.conf
   lighttpd-enable-mod accesslog
   lighttpd-enable-mod alias
   lighttpd-enable-mod cgi
