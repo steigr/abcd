@@ -3,11 +3,7 @@
 rest_arguments() {
 	name=${1}
 	options=${2}
-	if [ "x" = "x$(echo ${PATH_INFO} | grep ${name})" ]; then
-		return
-	else
-		echo "${PATH_INFO}" |  sed -e "s#.*/${name}/##" | cut -f-${options} -d"/"
-	fi
+	echo ${PATH_INFO} | awk -F'/${name}/' '{print $2}' | cut -f-${options} -d"/"
 }
 
 rest_need_argument() {
