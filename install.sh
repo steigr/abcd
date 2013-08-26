@@ -30,8 +30,8 @@ get_domainname() {
 
 
 install_packages() {
-  apt-get update >~/abcd-installer-$$.log 2>~/abcd-installer-$$.err
-  apt-get install bind9 isc-dhcp-server lighttpd bind9-host python-dnspython python-daemon >~/abcd-installer-$$.log 2>~/abcd-installer-$$.err
+  apt-get update -q >~/abcd-installer-$$.log 2>~/abcd-installer-$$.err
+  apt-get install -y -q bind9 isc-dhcp-server lighttpd bind9-host python-dnspython python-daemon >~/abcd-installer-$$.log 2>~/abcd-installer-$$.err
 }
 
 configure_lighttpd() {
@@ -87,7 +87,7 @@ install_ipxe() {
   read ANSWER
   case "$ANSWER" in
     y)
-      apt-get install -y make gcc binutils zlib1g-dev syslinux
+      apt-get install -q -y make gcc binutils zlib1g-dev syslinux
       IPXETMP=/tmp/ipxe.$$
       git clone git://git.ipxe.org/ipxe.git $IPXETMP
       cat << 'IPXE_BOOT_SCRIPT' >$IPXETMP/default-script
