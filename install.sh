@@ -78,7 +78,7 @@ install_abcd() {
   chmod 660 /etc/abcd/clients
   
   chown root:www-data /usr/lib/abcd/server
-  chmod 750 /usr/lib/abcd-server
+  chmod 750 /usr/lib/abcd/server
   
 }
 
