@@ -3,7 +3,7 @@
 rest_arguments() {
 	name=${1}
 	options=${2}
-	if [ "x" = "$(echo ${PATH_INFO} | grep ${name})" ]; then
+	if [ "x" = "x$(echo ${PATH_INFO} | grep ${name})" ]; then
 		return
 	else
 		echo "${PATH_INFO}" |  sed -e "s#.*/${name}/##" | cut -f-${options} -d"/"
