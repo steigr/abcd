@@ -43,8 +43,10 @@ $HTTP["host"] =~ "^@($|.@@)" {
   }
 }
 EOF_LIGHTTPD_CONF
-  sed -i -e "s#@@#$DOMAINNAME" \
-         -e "s#@#$HOSTNAME#" \
+  BOOTSERVER=$(host -t SRV _netboot._autoprovision | rev | awk '{print $1}' | cut -b2- | rev) 
+  BOOTSERVERNAME=$(echo $BOOTSERVER | sed -e "s#\.$DOMAINNAME##")
+  sed -i -e "s#@@#$DOMAINNAME#" \
+         -e "s#@#$BOOTSERVERNAME#" \
     /etc/lighttpd/conf-available/60-abcd.conf
   lighttpd-enable-mod accesslog
   lighttpd-enable-mod alias
