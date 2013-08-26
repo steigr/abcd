@@ -97,11 +97,13 @@ dhcp
 imgload tftp://${next-server}/${filename}
 boot
 IPXE_BOOT_SCRIPT
+      OLDPWD=$(pwd)
       cd $IPXETMP/src
       cp config/*.h config/local
       make EMBED=$IPXETMP/default-script bin/undionly.kpxe
       mkdir -p /var/lib/abcd/boot/ipxe
       cp bin/undionly.kpxe /var/lib/abcd/boot/ipxe/binary
+      cd $OLDPWD
       rm -rf $IPXETMP
     ;;
     *)
