@@ -6,6 +6,9 @@ set -e
 TMP_ISO=/tmp/$$.iso
 TMP_DIR=/tmp/$$.loop
 DOWNLOAD_TRACK=/tmp/abcd-download.track
+
+[[ -f $DOWNLOAD_TRACK ]] && rm $DOWNLOAD_TRACK
+
 mkdir -p $TMP_DIR
 touch $DOWNLOAD_TRACK
 
