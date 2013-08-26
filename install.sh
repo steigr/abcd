@@ -116,6 +116,7 @@ install_installers() {
     *)
       echo 'You may run abcd-downloader to get these files later, abcd will not work without them. Please look at /etc/abcd/download.d for more distros or other mirros'
     ;;
+  esac
 }
 
 display_welcomemsg
