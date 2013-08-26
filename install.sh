@@ -85,6 +85,7 @@ install_abcd() {
   
   cp -r lib/* /usr/lib/abcd
   cp -r etc/* /etc/abcd
+  cp -r var/* /var/lib/abcd
   
   chown root:www-data /etc/abcd/clients
   chmod 660 /etc/abcd/clients
