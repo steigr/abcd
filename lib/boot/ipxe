@@ -38,12 +38,21 @@ fi
 
 case "$RESPONSE" in
 	binary)
+		rest_need_argument MAC
+		rest_need_argument PART
+		rest_need_argument VARIANT
 		ipxe_send_binary
 	;;
 	netboot)
+		rest_need_argument MAC
+		rest_need_argument PART
+		rest_need_argument VARIANT
 		FILE=$NETBOOT_FILE ipxe_send_netboot
 	;;
 	hdboot)
+		rest_need_argument MAC
+		rest_need_argument PART
+		rest_need_argument VARIANT
 		ipxe_send_hdboot
 	;;
 esac

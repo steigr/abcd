@@ -5,3 +5,11 @@ rest_arguments() {
 	options=${2}
 	echo "${PATH_INFO}" |  sed -e "s#^.*/${name}/##" | cut -f-${options} -d"/"
 }
+
+rest_need_argument() {
+	param=${1}
+	if [ "x" = "x${!param}" ]; then
+		http_error 500
+		exit 0
+	fi
+}

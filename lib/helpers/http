@@ -15,6 +15,7 @@ http_header() {
 
 http_error() {
 	state404="Not found"
+	state500="Internal Server Error"
 	state501="Not implemented"
 	state200="OK"
 	http_header Status "${1} $(eval echo \$state$1)"
