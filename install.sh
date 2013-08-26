@@ -5,7 +5,7 @@ display_welcomemsg() {
   cat <<'EOINFO'
 Installation-Helper for Automatic Bootstrap and Configuration Daemon (abcd)
 
-The installer will install abcd and tf2httpd. It many futher install a web, dns and a dhcp-server.
+The installer will install abcd and tf2httpd. It may futher install a web, dns and a dhcp-server.
 
 EOINFO
 }
@@ -60,11 +60,11 @@ install_tf2httpd() {
 }
 
 install_abcd() {
-  test -e /etc/abcd || rm -rf /etc/abcd
+  test -e /etc/abcd && rm -rf /etc/abcd
   mkdir /etc/abcd
-  test -e /usr/lib/abcd || rm -rf /usr/lib/abcd
+  test -e /usr/lib/abcd && rm -rf /usr/lib/abcd
   mkdir /usr/lib/abcd
-  test -e /var/lib/abcd || rm -rf /var/lib/abcd
+  test -e /var/lib/abcd && rm -rf /var/lib/abcd
   mkdir /var/lib/abcd
   
   cp sbin/abcd-downloader /usr/sbin/abcd-downloader
