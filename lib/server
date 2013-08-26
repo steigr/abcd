@@ -2,7 +2,7 @@
 set -x
 set -e
 
-. /etc/netboot/config
+. /etc/abcd/config
 
 . "${LIBEXEC}/helpers/parse"
 . "${LIBEXEC}/helpers/http"

@@ -9,7 +9,7 @@ process_placeholder() {
 	FILE=${1}
 	PLACEHOLDER=${2}
 	ARG_VALUE=${3}
-	CFG_VALUE=$(eval $(grep -E "^\s*${PLACEHOLDER}" /etc/netboot/config ); echo ${!PLACEHOLDER})
+	CFG_VALUE=$(eval $(grep -E "^\s*${PLACEHOLDER}" /etc/abcd/config ); echo ${!PLACEHOLDER})
 	ENV_VALUE=${!PLACEHOLDER}
 	if [ "x${ARG_VALUE}" != "x" ]; then
 		VALUE=${ARG_VALUE}
