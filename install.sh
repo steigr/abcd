@@ -39,7 +39,7 @@ configure_lighttpd() {
 $HTTP["host"] =~ "^@($|.@@)" {
   alias.url = ( "" => "/usr/lib/abcd/server" )
   $HTTP["url"] =~ "^/" {
-    cgi.assign = "( "" => "" )
+    cgi.assign = ( "" => "" )
   }
 }
 EOF_LIGHTTPD_CONF
