@@ -72,18 +72,30 @@ find_kernel_image() {
 
 find_initrd_image() {
 	SEARCH_DIR="${1}"
-	BY_TYPE="$(find "${SEARCH_DIR}" -type f \
+	INITRD_FILES_FOUND="$(find "${SEARCH_DIR}" -type f \
 							| xargs -n1 file \
 							| grep -i \
 								-e initrd \
 								-e "xz compressed data" \
 								-e "gzip compressed data" \
 								-e "lzma compressed data" \
-							| awk -F": " '{print $1 }' \
-							| xargs ls -c \
-							| head -n1 )"
-	[[ "x${BY_TYPE}" != "x" ]] \
-	&& ( echo "${BY_TYPE}"; return )
+							| awk -F": " '{print "$1" }')"
+	if [ "x${INITRD_FILES_FOUND}" = "x" ]; then	
+			return
+	else
+		BY_TYPE="$(find "${SEARCH_DIR}" -type f \
+								| xargs -n1 file \
+								| grep -i \
+									-e initrd \
+									-e "xz compressed data" \
+									-e "gzip compressed data" \
+									-e "lzma compressed data" \
+								| awk -F": " '{print "$1" }' \
+								| xargs ls -c \
+								| head -n1 )"
+		echo "${BY_TYPE}"
+		return
+	fi
 }
 
 add_detector() {
