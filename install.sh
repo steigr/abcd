@@ -66,8 +66,7 @@ install_lhtfs() {
   apt-get install fuse python-fuse -y
   git clone git://github.com/steigr/lhtfs.git /tmp/lhtfs
   cp /tmp/lhtfs/lhtfs /usr/sbin/lhtfs
-  chmod +x /usr/sbin/lhtfs
-  echo 'user_allow_other' >> /etc/fuse.conf
+  chmod 0700 /usr/sbin/lhtfs
   adduser nobody fuse
   echo 'lhtfs#http://bootserver /srv/tftp fuse  defaults,allow_other 0 0' >> /etc/fstab
   mount /srv/tftp
