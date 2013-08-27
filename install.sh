@@ -57,17 +57,20 @@ EOF_LIGHTTPD_CONF
 }
 
 
-install_tf2httpd() {
+install_atftpd() {
+  apt-get install -y atftpd
+}
+
+install_lhtfs() {
   
-  git clone git://github.com/steigr/tf2httpd.git /tmp/tf2httpd
-  
-  cp /tmp/tf2httpd/tf2httpd /usr/sbin/tf2httpd
-  cp /tmp/tf2httpd/tf2httpd.init /etc/init.d/tf2httpd
-  update-rc.d tf2httpd defaults
-  
-  rm -rf /tmp/tf2httpd
-  
-  host -t SRV _netboot._autoprovision || display_needsrvrr
+  apt-get install fuse -y
+  git clone git://github.com/steigr/lhtfs.git /tmp/lhtfs
+  cp /tmp/lhtfs/lhtfs /usr/sbin/lhtfs
+  chmod +x /usr/sbin/lhtfs
+  echo 'user_allow_other' >> /etc/fuse.conf
+  adduser nobody fuse
+  echo 'lhtfs#http://bootserver /srv/tftp fuse  defaults,allow_other 0 0' >> /etc/fstab
+  mount /srv/tftp
   
 }
 
@@ -142,7 +145,8 @@ display_welcomemsg
 get_domainname
 install_packages
 configure_lighttpd
-install_tf2httpd
+install_atftpd
+install_lhtfs
 install_abcd
 install_ipxe
 install_installers
