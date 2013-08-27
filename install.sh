@@ -24,8 +24,13 @@ EODNSSRV
 }
 
 get_domainname() {
-  echo -n "Please give your domain-name: "
+  echo -n "Enter Domainname: "
   read DOMAINNAME
+}
+
+get_bootserver() {
+  echo -n "Enter FQDN of the bootserver: "
+  read BOOTSERVER
 }
 
 
@@ -43,7 +48,6 @@ $HTTP["host"] =~ "^@($|.@@)" {
   }
 }
 EOF_LIGHTTPD_CONF
-  BOOTSERVER=$(host -t SRV _netboot._autoprovision | rev | awk '{print $1}' | cut -b2- | rev) 
   BOOTSERVERNAME=$(echo $BOOTSERVER | sed -e "s#\.$DOMAINNAME##")
   sed -i -e "s#@@#$DOMAINNAME#" \
          -e "s#@#$BOOTSERVERNAME#" \
@@ -147,6 +151,7 @@ install_installers() {
 
 display_welcomemsg
 get_domainname
+get_bootserver
 install_packages
 configure_lighttpd
 install_atftpd
