@@ -84,7 +84,7 @@ system_update_hostname() {
 	|| export MYHOSTNAME=$(echo $MYFQDN | sed -e "s#\\.$MYDOMAIN##")
 	echo "Detected hostname: $MYHOSTNAME" >/dev/tty1
 	echo "$MYHOSTNAME" > /etc/hostname
-	echo -e "127.0.0.1\\\tlocalhost.localdomain localhost\\\n$MYFIRSTIP\\\t$MYFQDN $MYHOSTNAME" > /etc/hosts
+	echo -e "127.0.0.1\tlocalhost.localdomain localhost\n$MYFIRSTIP\t$MYFQDN $MYHOSTNAME" > /etc/hosts
 	hostname -F /etc/hostname
 }
 
