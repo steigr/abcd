@@ -79,7 +79,7 @@ find_initrd_image() {
 								-e "xz compressed data" \
 								-e "gzip compressed data" \
 								-e "lzma compressed data" \
-							| awk -F": " '{print "$1" }')"
+							| awk -F": " '{print $1 }')"
 	if [ "x${INITRD_FILES_FOUND}" = "x" ]; then	
 			return
 	else
@@ -90,7 +90,7 @@ find_initrd_image() {
 									-e "xz compressed data" \
 									-e "gzip compressed data" \
 									-e "lzma compressed data" \
-								| awk -F": " '{print "$1" }' \
+								| awk -F": " '{print $1 }' \
 								| xargs ls -c \
 								| head -n1 )"
 		echo "${BY_TYPE}"
