@@ -177,8 +177,6 @@ case "$1" in
     display_welcomemsg
     ask_domainname
     ask_bootserver
-    ask_domainname
-    ask_bootserver
     ask_install_bind9
     ask_install_dhcpd
     ask_install_lighttpd
