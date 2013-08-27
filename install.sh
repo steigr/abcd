@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 display_welcomemsg() {
 
@@ -174,12 +174,24 @@ display_welcomemsg
 
 ask_domainname
 ask_bootserver
-ask_install_bind9
-ask_install_dhcpd
-ask_install_lighttpd
-ask_install_atftpd
-ask_install_ipxe
-ask_install_abcddownloader
+case "$1" in
+  -d)
+    INSTALL_BIND9=y
+    INSTALL_DHCPD=y
+    INSTALL_ATFTPD=y
+    INSTALL_LIGHTTPD=y
+    INSTALL_IPXE=y
+    INSTALL_ABCDDOWNLOADER=y
+  ;;
+  *)
+    ask_install_bind9
+    ask_install_dhcpd
+    ask_install_lighttpd
+    ask_install_atftpd
+    ask_install_ipxe
+    ask_install_abcd_downloader
+  ;;
+esac
 
 install_packages
 install_lhtfs
