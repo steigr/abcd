@@ -124,50 +124,32 @@ install_abcd() {
 }
 
 install_ipxe() {
-  echo -n "Install ipxe from git (y/n): "
-  read ANSWER
-  case "$ANSWER" in
-    y)
-      apt-get install -q -y make gcc binutils zlib1g-dev syslinux
-      IPXETMP=/tmp/ipxe.$$
-      git clone git://git.ipxe.org/ipxe.git $IPXETMP
-      cat << 'IPXE_BOOT_SCRIPT' >$IPXETMP/default-script
+  apt-get install -q -y make gcc binutils zlib1g-dev syslinux
+  IPXETMP=/tmp/ipxe.$$
+  git clone git://git.ipxe.org/ipxe.git $IPXETMP
+  cat << 'IPXE_BOOT_SCRIPT' >$IPXETMP/default-script
 #!ipxe
 prompt --key 0x02 --timeout 2000 Press Ctrl-B for the iPXE command line... && shell ||
 dhcp
 imgload tftp://${next-server}/${filename}
 boot
 IPXE_BOOT_SCRIPT
-      OLDPWD=$(pwd)
-      cd $IPXETMP/src
-      cp config/*.h config/local
-      make EMBED=$IPXETMP/default-script bin/undionly.kpxe
-      mkdir -p /var/lib/abcd/boot/ipxe
-      cp bin/undionly.kpxe /var/lib/abcd/boot/ipxe/binary
-      cd $OLDPWD
-      rm -rf $IPXETMP
-    ;;
-    *)
-      echo 'Not installing. Please use ipxe (or gpxe) into /var/lib/abcd/boot/$PXE_FLAVOUR/binary. Netboot-Scripts will be named netboot.$PXE_FLAVOUR'
-    ;;
-  esac
+  OLDPWD=$(pwd)
+  cd $IPXETMP/src
+  cp config/*.h config/local
+  make EMBED=$IPXETMP/default-script bin/undionly.kpxe
+  mkdir -p /var/lib/abcd/boot/ipxe
+  cp bin/undionly.kpxe /var/lib/abcd/boot/ipxe/binary
+  cd $OLDPWD
+  rm -rf $IPXETMP
 }
 
 install_abcd_downloader() {
-  echo -n "Download netboot-intallers for Debian/Ubuntu/OpenSUSE/CentOS/Fedora/Archlinux/Gentoo (recent versions) (y/n): "
-  read ANSWER
-  case "$ANSWER" in
-    y)
-      rm -rf /etc/abcd/download.d
-      git clone git://github.com/steigr/abcd-downloader.git /etc/abcd/download.d
-      ln -s /etc/abcd/download.d/abcd-downloader /usr/sbin/abcd-downloader
-      chmod 0700 /etc/abcd/download.d/abcd-downloader
-      abcd-downloader
-    ;;
-    *)
-      echo 'You may run abcd-downloader to get these files later, abcd will not work without them. Please look at /etc/abcd/download.d for more distros or other mirros'
-    ;;
-  esac
+  rm -rf /etc/abcd/download.d
+  git clone git://github.com/steigr/abcd-downloader.git /etc/abcd/download.d
+  ln -s /etc/abcd/download.d/abcd-downloader /usr/sbin/abcd-downloader
+  chmod 0700 /etc/abcd/download.d/abcd-downloader
+  abcd-downloader
 }
 
 display_welcomemsg
