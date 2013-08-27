@@ -10,36 +10,61 @@ The installer will install abcd and tf2httpd. It may futher install a web, dns a
 EOINFO
 }
 
-display_needsrvrr() {
-
-  cat <<EODNSSRV
-
-Your local DNS-Domain must be extended by one DNS-Service-Record (DNS-SRV):
-
-_netboot._autoprovision IN SRV 10 10 80 $(hostname -f).
-
-This record is needed for tf2httpd, which forward tftp-requests as HTTP-GET-request to this server.
-
-EODNSSRV
-}
-
-get_domainname() {
+ask_domainname() {
   echo -n "Enter Domainname: "
   read DOMAINNAME
 }
 
-get_bootserver() {
+ask_bootserver() {
   echo -n "Enter FQDN of the bootserver: "
   read BOOTSERVER
 }
 
+ask_install_bind9() {
+  echo -n "Install bind9 DNS-Server (y/n): "
+  read INSTALL_BIND9
+}
+
+ask_install_dhcpd() {
+  echo -n "Install ISC DHCP-Server (y/n): "
+  read INSTALL_DHCPD
+}
+
+ask_install_lighttpd() {
+  echo -n "Install Lighttpd Web-Server (y/n): "
+  read INSTALL_LIGHTTPD
+}
+
+ask_install_ipxe() {
+  echo -n "Compile iPXE-Bootloader (y/n): "
+  read INSTALL_IPXE
+}
+
+ask_install_atftpd() {
+  echo -n "Install aTFTP-Server (y/n): "
+  read INSTALL_ATFTPD
+}
+
+ask_install_abcd_downloader() {
+  echo -n "Install and run ABCD-Downloader (y/n): "
+  read INSTALL_ABCDDOWNLOADER
+}
 
 install_packages() {
   apt-get update -q
-  apt-get install -y -q bind9 isc-dhcp-server lighttpd bind9-host
+  apt-get install -y -q bind9-host
 }
 
-configure_lighttpd() {
+install_bind9() {
+  apt-get install -y -q bind9
+}
+
+install_dhcpd() {
+  apt-get install -y -q isc-dhcp-server 
+}
+
+install_lighttpd() {
+  apt-get install -y -q lighttpd
   cat <<'EOF_LIGHTTPD_CONF' >/etc/lighttpd/conf-available/60-abcd.conf
 $HTTP["host"] =~ "^@($|.@@)" {
   alias.url = ( "" => "/usr/lib/abcd/server" )
@@ -129,18 +154,14 @@ IPXE_BOOT_SCRIPT
 }
 
 install_abcd_downloader() {
-	rm -rf /etc/abcd/download.d
-	git clone git://github.com/steigr/abcd-downloader.git /etc/abcd/download.d
-	ln -s /etc/abcd/download.d/abcd-downloader /usr/sbin/abcd-downloader
-	chmod 0700 /etc/abcd/download.d/abcd-downloader
-}
-
-install_installers() {
   echo -n "Download netboot-intallers for Debian/Ubuntu/OpenSUSE/CentOS/Fedora/Archlinux/Gentoo (recent versions) (y/n): "
   read ANSWER
   case "$ANSWER" in
     y)
-      install_abcd_downloader
+      rm -rf /etc/abcd/download.d
+      git clone git://github.com/steigr/abcd-downloader.git /etc/abcd/download.d
+      ln -s /etc/abcd/download.d/abcd-downloader /usr/sbin/abcd-downloader
+      chmod 0700 /etc/abcd/download.d/abcd-downloader
       abcd-downloader
     ;;
     *)
@@ -150,12 +171,23 @@ install_installers() {
 }
 
 display_welcomemsg
-get_domainname
-get_bootserver
+
+ask_domainname
+ask_bootserver
+ask_install_bind9
+ask_install_dhcpd
+ask_install_lighttpd
+ask_install_atftpd
+ask_install_ipxe
+ask_install_abcddownloader
+
 install_packages
-configure_lighttpd
-install_atftpd
 install_lhtfs
+[[ "x${INSTALL_BIND9}" = "xy" ]] && install_bind9
+[[ "x${INSTALL_DHCPD}" = "xy" ]] && install_dhcpd
+[[ "x${INSTALL_LIGHTTPD}" = "xy" ]] && install_lighttpd
+[[ "x${INSTALL_ATFTPD}" = "xy" ]] && install_atftpd
 install_abcd
-install_ipxe
+[[ "x${INSTALL_IPXE}" = "xy" ]] && install_ipxe
+[[ "x${INSTALL_ABCDDOWNLOADER}" = "xy" ]] && install_abcd_downloader
 
