@@ -69,6 +69,7 @@ install_lhtfs() {
   chmod 0700 /usr/sbin/lhtfs
   adduser nobody fuse
   echo 'lhtfs#http://bootserver /srv/tftp fuse  defaults,allow_other 0 0' >> /etc/fstab
+  umount /srv/tftp
   mount /srv/tftp
   
 }
