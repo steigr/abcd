@@ -81,10 +81,6 @@ install_abcd() {
   test -e /var/lib/abcd && rm -rf /var/lib/abcd
   mkdir /var/lib/abcd
   
-  cp sbin/abcd-downloader /usr/sbin/abcd-downloader
-  chown root:root /usr/sbin/abcd-downloader
-  chmod 744 /usr/sbin/abcd-downloader
-  
   cp -r lib/* /usr/lib/abcd
   cp -r etc/* /etc/abcd
   cp -r var/* /var/lib/abcd
@@ -127,11 +123,19 @@ IPXE_BOOT_SCRIPT
   esac
 }
 
+install_abcd_downloader() {
+	rm -rf /etc/abcd/download.d
+	git clone git://github.com/steigr/abcd-downloader.git /etc/abcd/download.d
+	ln -s /etc/abcd/download.d/abcd-downloader /usr/sbin/abcd-downloader
+	chmod 0700 /etc/abcd/download.d/abcd-downloader
+}
+
 install_installers() {
   echo -n "Download netboot-intallers for Debian/Ubuntu/OpenSUSE/CentOS/Fedora/Archlinux/Gentoo (recent versions) (y/n): "
   read ANSWER
   case "$ANSWER" in
     y)
+      install_abcd_downloader
       abcd-downloader
     ;;
     *)
@@ -148,5 +152,4 @@ install_atftpd
 install_lhtfs
 install_abcd
 install_ipxe
-install_installers
 
