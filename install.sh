@@ -31,7 +31,7 @@ get_domainname() {
 
 install_packages() {
   apt-get update -q
-  apt-get install -y -q bind9 isc-dhcp-server lighttpd bind9-host python-dnspython python-daemon
+  apt-get install -y -q bind9 isc-dhcp-server lighttpd bind9-host
 }
 
 configure_lighttpd() {
@@ -63,7 +63,7 @@ install_atftpd() {
 
 install_lhtfs() {
   
-  apt-get install fuse -y
+  apt-get install fuse python-fuse -y
   git clone git://github.com/steigr/lhtfs.git /tmp/lhtfs
   cp /tmp/lhtfs/lhtfs /usr/sbin/lhtfs
   chmod +x /usr/sbin/lhtfs
