@@ -153,10 +153,11 @@ IPXE_BOOT_SCRIPT
 }
 
 install_abcd_downloader() {
-  rm -rf /etc/abcd/download.d
-  git clone git://github.com/steigr/abcd-downloader.git /etc/abcd/download.d
-  ln -s /etc/abcd/download.d/abcd-downloader /usr/sbin/abcd-downloader
-  chmod 0700 /etc/abcd/download.d/abcd-downloader
+  rm -rf /etc/abcd/downloads.d
+  git clone git://github.com/steigr/abcd-downloader.git /etc/abcd/downloads.d
+  rm $(which abcd-downloader)
+  ln -s /etc/abcd/downloads.d/abcd-downloader /usr/sbin/abcd-downloader
+  chmod 0700 /etc/abcd/downloads.d/abcd-downloader
   abcd-downloader
 }
 
