@@ -10,6 +10,14 @@ The installer will install abcd and tf2httpd. It may futher install a web, dns a
 EOINFO
 }
 
+display_finished_installation() {
+  cat <<'EOFINISHED'
+Installation complete.
+
+Please check out the files in /etc/abcd and /var/lib/abcd and change them as needed. (Especially ROOTPASSWORD-String)
+EOFINISHED
+}
+
 ask_domainname() {
   echo -n "Enter Domainname: "
   read DOMAINNAME
@@ -152,12 +160,11 @@ install_abcd_downloader() {
   abcd-downloader
 }
 
-display_welcomemsg
 
-ask_domainname
-ask_bootserver
 case "$1" in
   -d)
+    DOMAINNAME=$(dnsdomainname)
+    BOOTSERVER=bootserver.$DOMAINNAME
     INSTALL_BIND9=y
     INSTALL_DHCPD=y
     INSTALL_ATFTPD=y
@@ -166,6 +173,11 @@ case "$1" in
     INSTALL_ABCDDOWNLOADER=y
   ;;
   *)
+    display_welcomemsg
+    ask_domainname
+    ask_bootserver
+    ask_domainname
+    ask_bootserver
     ask_install_bind9
     ask_install_dhcpd
     ask_install_lighttpd
@@ -185,3 +197,4 @@ install_abcd
 [[ "x${INSTALL_IPXE}" = "xy" ]] && install_ipxe
 [[ "x${INSTALL_ABCDDOWNLOADER}" = "xy" ]] && install_abcd_downloader
 
+display_finished_installation
