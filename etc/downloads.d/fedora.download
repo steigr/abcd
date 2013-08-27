@@ -1,7 +1,0 @@
-# Fedora
-fedora/19/vmlinuz=http://ftp-stud.fht-esslingen.de/pub/Mirrors/fedora/linux/releases/19/Fedora/x86_64/os/images/pxeboot/vmlinuz
-fedora/19/initrd.img=http://ftp-stud.fht-esslingen.de/pub/Mirrors/fedora/linux/releases/19/Fedora/x86_64/os/images/pxeboot/initrd.img
-fedora/18/vmlinuz=http://ftp-stud.fht-esslingen.de/pub/Mirrors/fedora/linux/releases/18/Fedora/x86_64/os/images/pxeboot/vmlinuz
-fedora/18/initrd.img=http://ftp-stud.fht-esslingen.de/pub/Mirrors/fedora/linux/releases/18/Fedora/x86_64/os/images/pxeboot/initrd.img
-fedora/17/vmlinuz=http://ftp-stud.fht-esslingen.de/pub/Mirrors/fedora/linux/releases/17/Fedora/x86_64/os/images/pxeboot/vmlinuz
-fedora/17/initrd.img=http://ftp-stud.fht-esslingen.de/pub/Mirrors/fedora/linux/releases/17/Fedora/x86_64/os/images/pxeboot/initrd.img

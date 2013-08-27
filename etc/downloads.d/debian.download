@@ -1,5 +1,0 @@
-#Debian
-debian/wheezy/linux=http://ftp.de.debian.org/debian/dists/wheezy/main/installer-amd64/current/images/netboot/debian-installer/amd64/linux
-debian/wheezy/initrd.gz=http://ftp.de.debian.org/debian/dists/wheezy/main/installer-amd64/current/images/netboot/debian-installer/amd64/initrd.gz
-debian/squeeze/linux=http://ftp.de.debian.org/debian/dists/squeeze/main/installer-amd64/current/images/netboot/debian-installer/amd64/linux
-debian/squeeze/initrd.gz=http://ftp.de.debian.org/debian/dists/squeeze/main/installer-amd64/current/images/netboot/debian-installer/amd64/initrd.gz

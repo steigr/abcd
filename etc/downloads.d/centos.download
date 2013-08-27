@@ -1,5 +1,0 @@
-# CentOS
-centos/6.4/vmlinuz=http://ftp-stud.fht-esslingen.de/pub/Mirrors/centos/6.4/os/x86_64/images/pxeboot/vmlinuz
-centos/6.4/initrd.img=http://ftp-stud.fht-esslingen.de/pub/Mirrors/centos/6.4/os/x86_64/images/pxeboot/initrd.img
-centos/5.9/vmlinuz=http://ftp-stud.fht-esslingen.de/pub/Mirrors/centos/5.9/os/x86_64/images/pxeboot/vmlinuz
-centos/5.9/initrd.img=http://ftp-stud.fht-esslingen.de/pub/Mirrors/centos/5.9/os/x86_64/images/pxeboot/initrd.img
