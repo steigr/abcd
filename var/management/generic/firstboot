@@ -6,29 +6,80 @@ echo -e "\\nFirstboot-Script is executed" >/dev/tty1
 touch /tmp/firstboot.executed
 
 DOWNLOAD=$(if [ -x "/usr/bin/wget" ]; then echo "/usr/bin/wget -O "; else if [ -x "/usr/bin/curl" ]; then echo "/usr/bin/curl -o "; fi; fi)
+
 $DOWNLOAD - -q @BASEURL@/notify/state/firstboot/start >/dev/null
 
-check_centos_5() { [[ "x$(grep -e "^CentOS Release 5." /etc/redhat-release)" != "x" ]] && echo true || echo false; }
-check_centos_6() { [[ "x$(grep -e "^CentOS Release 6." /etc/centos-release)" != "x" ]] && echo true || echo false; }
-check_sles_10() {  [[ "x$(grep -e "^SUSE Linux Enterprise Server 10" /etc/SuSE-release)" != "x" ]] && echo true || echo false; }
-check_sles_11() {  [[ "x$(grep -e "^SUSE Linux Enterprise Server 11" /etc/SuSE-release)" != "x" ]] && echo true || echo false; }
-check_opensuse_11() {  [[ "x$(grep -e "^openSUSE 11" /etc/SuSE-release)" != "x" ]] && echo true || echo false; }
-check_opensuse_12() {  [[ "x$(grep -e "^openSUSE 12" /etc/SuSE-release)" != "x" ]] && echo true || echo false; }
-check_opensuse_13() {  [[ "x$(grep -e "^openSUSE 13" /etc/SuSE-release)" != "x" ]] && echo true || echo false; }
+check_centos_5()		{ [[ "x$(grep -e "^CentOS Release 5." /etc/redhat-release)" 			!= "x" ]] && echo true || echo false; }
+check_centos_6()		{ [[ "x$(grep -e "^CentOS Release 6." /etc/centos-release)" 			!= "x" ]] && echo true || echo false; }
+check_sles_10()			{ [[ "x$(grep -e "^SUSE Linux Enterprise Server 10" /etc/SuSE-release)" != "x" ]] && echo true || echo false; }
+check_sles_11()			{ [[ "x$(grep -e "^SUSE Linux Enterprise Server 11" /etc/SuSE-release)" != "x" ]] && echo true || echo false; }
+check_opensuse_11() 	{ [[ "x$(grep -e "^openSUSE 11" /etc/SuSE-release)" 					!= "x" ]] && echo true || echo false; }
+check_opensuse_12() 	{ [[ "x$(grep -e "^openSUSE 12" /etc/SuSE-release)" 					!= "x" ]] && echo true || echo false; }
+check_opensuse_13()		{ [[ "x$(grep -e "^openSUSE 13" /etc/SuSE-release)" 					!= "x" ]] && echo true || echo false; }
+check_debian_6()		{ [[ "x$(grep -e "6\." /etc/debian_version)"							!= "x" ]] && echo true || echo false; }
+check_debian_sid()		{ [[ "x$(grep -e "sid" /etc/debian_version)"							!= "x" ]] && echo true || echo false; }
+check_ubuntu() 			{ [[ "x$(ls /etc/ubuntu_version)"										!= "x" ]] && echo true || echo false; }
+check_gentoo()			{ [[ "x$(ls /etc/gentoo-release)"                                       != "x" ]] && echo true || echo false; }
+check_fedora()			{ [[ "x$(ls /etc/fedora-release)"										!= "x" ]] && echo true || echo false; }
+check_archlinux()		{ [[ "x$(ls /etc/arch-release)"											!= "x" ]] && echo true || echo false; }
 
-os_selector() {
-	[[ "$(check_centos_5)" = "true" ]] && ( firstboot_centos; return )
-	[[ "$(check_centos_6)" = "true" ]] && ( firstboot_centos; return )
-	[[ "$(check_sles_10)"  = "true" ]] && ( firstboot_sles; return )
-	[[ "$(check_sles_11)"  = "true" ]] && ( firstboot_sles; return )
-	[[ "$(check_opensuse_11)"  = "true" ]] && ( firstboot_opensuse; return )
-	[[ "$(check_opensuse_12)"  = "true" ]] && ( firstboot_opensuse; return )
-	[[ "$(check_opensuse_13)"  = "true" ]] && ( firstboot_opensuse; return )
-	
-	[[ -f "/etc/arch-release"   ]] && ( firstboot_archlinux; return )
-	[[ -f "/etc/debian_version" ]] && ( firstboot_debian;    return )
-	[[ -f "/etc/gentoo-release" ]] && ( firstboot_gentoo;    return )
-	[[ -f "/etc/fedora-release" ]] && ( firstboot_fedora;    return )
+os_selector() {	
+
+	alias firstboot_debian=firstboot_apt_based
+	alias firstboot_ubuntu=firstboot_apt_based
+	alias firstboot_archlinux=firstboot_pacman_based
+	alias firstboot_feroda=firstboot_yum_based
+	alias firstboot_centos=firstboot_yum_based
+	alias firstboot_rhel=firstboot_yum_based
+
+	[[ "$(check_centos_5)"		= "true" ]] && ( firstboot_centos 5;		return )
+	[[ "$(check_centos_6)"		= "true" ]] && ( firstboot_centos 6;		return )
+	[[ "$(check_sles_10)"		= "true" ]] && ( firstboot_sles 10; 		return )
+	[[ "$(check_sles_11)"  		= "true" ]] && ( firstboot_sles 11;			return )
+	[[ "$(check_opensuse_11)"	= "true" ]] && ( firstboot_opensuse 11;		return )
+	[[ "$(check_opensuse_12)"	= "true" ]] && ( firstboot_opensuse 12;		return )
+	[[ "$(check_opensuse_13)"	= "true" ]] && ( firstboot_opensuse 13;		return )
+	[[ "$(check_debian_6)"		= "true" ]] && ( firstboot_debian wheezy;	return )
+	[[ "$(check_debian_sid)"	= "true" ]] && ( firstboot_debian sid;		return )
+	[[ "$(check_ubuntu)"		= "true" ]] && ( firstboot_ubuntu;			return )
+	[[ "$(check_gentoo)"		= "true" ]] && ( firstboot_gentoo;			return )
+	[[ "$(check_fedora)"		= "true" ]] && ( firstboot_fedora;			return )
+	[[ "$(check_archlinux)"		= "true" ]] && ( firstboot_archlinux;		return )
+
+}
+
+firstboot_apt_based() {
+	VERSION=${1}
+	ifup eth0
+	check_network_connectivity
+	system_update_hostname
+	PUPPETSERVER=@PUPPETSERVER@
+	REPODEB=/tmp/puppet-$$.deb
+	wget -O $REPODEB http://apt.puppetlabs.com/puppetlabs-release-${VERSION}.deb
+	dpkg -i $REPODEB
+	rm $REPODEB
+	apt-get update
+	apt-get install -y puppet
+	puppet_agent_config
+	puppet_agent_register
+	puppet_agent_cronjob
+}
+
+puppet_agent_config() {
+	echo > /etc/puppet/puppet.conf
+	echo "[agent]" >> /etc/puppet/puppet.conf
+	echo "server=puppet.$MYDOMAIN" >> /etc/puppet/puppet.conf
+	echo "report=true" >> /etc/puppet/puppet.conf
+	echo "pluginsync=true" >> /etc/puppet/puppet.conf
+	echo "certname=$MYFQDN" >> /etc/puppet/puppet.conf
+}
+
+puppet_agent_register() {
+	puppet agent -t --waitforcert 60
+}
+
+puppet_agent_cronjob() {
+	puppet resource cron puppet-agent ensure=present user=root minute=30 command='/usr/bin/puppet agent --onetime --no-daemonize --splay'
 }
 
 check_network_connectivity() {
@@ -49,28 +100,6 @@ check_network_connectivity() {
 	fi
 }
 
-aptget_install_packages() {
-	apt-get update
-  apt-get install -y \
-		bind9-host \
-		wget \
-		curl \
-		lsof \
-		openssh-server
-}
-
-pacman_install_packages() {
-	pacman --noconfirm -Syy
-	pacman --noconfirm -S \
-		dnsutils \
-		wget \
-		curl \
-		openssh \
-		lsof
-	systemctl enable sshd
-	systemctl start sshd
-}
-
 system_update_hostname() {
 	MYFIRSTIP=$(echo $(ip addr show eth0) | sed -e "s#.*inet ##" | cut -f1 -d"/")
 	MYFQDN=$(host $MYFIRSTIP | rev | cut -f1 -d" " | cut -b2- | rev )
@@ -88,185 +117,11 @@ system_update_hostname() {
 	hostname -F /etc/hostname
 }
 
-enlarge_tmpfs() {
-	[[ "$(df /tmp | grep -E "/tmp$" | awk '{print $4}')" -lt 5120000 ]] && umount /tmp
-}
-
-api_ping_prepare(){
-	mkdir -p /root/.ssh
-	$DOWNLOAD /root/.ssh/authorized_keys http://@PUPPETSERVER@/cgi-bin/addnode.cgi/ping/key
-}
-
-api_ping_install(){
-	VERSION="$( if [ "$(basename $(find / -name "libssl.so.*" | sort -n | tail -n1 ) | sed -e 's#libssl.so.##' -e 's#\\.##g' -e 's#[a-zA-Z]*$##g')" \\< "100" ]; then echo "28"; else echo "30"; fi )"
-	$DOWNLOAD - http://@PUPPETSERVER@/cgi-bin/addnode.cgi/ping/install/$VERSION
-}
-
-enable_orchestration() {
-	while true; do
-		if [ -x "/etc/init.d/pe-puppet" ]; then
-			break
-		fi
-		sleep 5
-	done
-	puppet agent -t
-	/etc/init.d/puppet restart
-}
-
-puppet_create_conf() {
-	echo > /etc/puppet/puppet.conf
-	echo "[agent]" >> /etc/puppet/puppet.conf
-	echo "server=puppet.$MYDOMAIN" >> /etc/puppet/puppet.conf
-	echo "report=true" >> /etc/puppet/puppet.conf
-	echo "pluginsync=true" >> /etc/puppet/puppet.conf
-	echo "certname=$MYFQDN" >> /etc/puppet/puppet.conf
-}
-
-puppet_create_csr() {
-	puppet agent --test
-}
-
-puppet_sign_csr() {
-	$DOWNLOAD - http://@PUPPETSERVER@/cgi-bin/addnode.cgi/ping/register
-}
-
-puppet_clean_cert() {
-	rm -rf /etc/puppet/ssl
-}
-
-archlinux_install_puppet() {
-	systemctl stop puppetagent
-	pacman --noconfirm -S \
-		ruby \
-		net-tools \
-		inetutils \
-		lsb-release
-	gem install --no-user-install --no-ri --no-rdoc puppet
-	[[ -f "$(which puppet)" ]] || ln -s $(find $(find /usr/lib/ruby -name "bin" -type d) -name puppet -type f | head -n1) /usr/bin
-	[[ -f "$(which facter)" ]] || ln -s $(find $(find /usr/lib/ruby -name "bin" -type d) -name facter -type f | head -n1) /usr/bin
-	[[ -f "$(which hiera)"  ]] || ln -s $(find $(find /usr/lib/ruby -name "bin" -type d) -name hiera  -type f | head -n1) /usr/bin
-	sudo puppet resource group puppet ensure=present
-	sudo puppet resource user puppet  ensure=present gid=puppet shell='/sbin/nologin'
-	curl -o /etc/systemd/system/multi-user.target.wants/puppetagent.service https://raw.github.com/puppetlabs/puppet/master/ext/systemd/puppetagent.service
-	mkdir -p /etc/puppet
-	puppet_create_conf
-	mkdir -p /run/puppet
-	puppet_clean_cert
-	puppet_create_csr
-	puppet_sign_csr
-}
-
-archlinux_enable_puppet() {
-	systemctl --system daemon-reload
-	systemctl start puppetagent
-}
-
-gentoo_install_puppet() {
-	emerge puppet
-	puppet_create_conf
-	puppet_clean_cert
-	puppet_create_csr
-	puppet_sign_csr
-}
-
-gentoo_enable_puppet() {
-	rc-update add puppet default
-	/etc/init.d/puppet start
-}
-
 finish() {
 	if [ "x$PUPPET_COMPLETE" = "x1" ];then
 		rm $0
 		#reboot
 	fi
-}
-
-firstboot_debian() {
-	export PUPPET_COMPLETE=1
-	ifup eth0
-	check_network_connectivity
-	aptget_install_packages
-	system_update_hostname
-	enlarge_tmpfs
-	api_ping_prepare
-	api_ping_install
-}
-
-firstboot_ubuntu() {
-	export PUPPET_COMPLETE=1
-	ifup eth0
-	check_network_connectivity
-	aptget_install_packages
-	system_update_hostname
-	enlarge_tmpfs
-	api_ping_prepare
-	api_ping_install
-}
-
-firstboot_archlinux() {
-	export PUPPET_COMPLETE=1
-	dhcpcd eth0
-	check_network_connectivity
-	pacman_install_packages
-	system_update_hostname
-	enlarge_tmpfs
-	api_ping_prepare
-	archlinux_install_puppet
-	archlinux_enable_puppet
-}
-
-firstboot_gentoo() {
-	export PUPPET_COMPLETE=1
-	system_update_hostname
-	enlarge_tmpfs
-	api_ping_prepare
-	gentoo_install_puppet
-	gentoo_enable_puppet
-}
-
-firstboot_opensuse() {
-	export PUPPET_COMPLETE=1
-	dhcpcd eth0
-	check_network_connectivity
-	system_update_hostname
-	enlarge_tmpfs
-	api_ping_prepare
-	enable_orchestration
-}
-
-firstboot_sles() {
-	export PUPPET_COMPLETE=1
-	dhcpcd eth0
-	check_network_connectivity
-	system_update_hostname
-	enlarge_tmpfs
-	api_ping_prepare
-	api_ping_install
-	enable_orchestration
-}
-
-firstboot_rhel(){
-	system_update_hostname
-	enlarge_tmpfs
-	api_ping_prepare
-	api_ping_install
-	enable_orchestration
-}
-
-firstboot_centos() {
-	system_update_hostname
-	enlarge_tmpfs
-	api_ping_prepare
-	api_ping_install
-	enable_orchestration
-}
-
-firstboot_fedora() {
-	system_update_hostname
-	enlarge_tmpfs
-	api_ping_prepare
-	api_ping_install
-	enable_orchestration
 }
 
 os_selector
