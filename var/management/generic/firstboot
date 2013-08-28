@@ -45,7 +45,6 @@ os_selector() {
 
 firstboot_apt_based() {
 	VERSION=${1}
-	ifup eth0
 	check_network_connectivity
 	notify_abcd firstboot start-script
 	notify_abcd firstboot install-software
@@ -67,7 +66,7 @@ firstboot_apt_based() {
 
 firstboot_zypper_based() {
 	VERSION=${1}
-	dhcpcd eth0
+	check_for_loginshell
 	check_network_connectivity
 	notify_abcd firstboot start-script
 	notify_abcd firstboot install-software
@@ -100,6 +99,15 @@ puppet_agent_register() {
 puppet_agent_cronjob() {
 	notify_abcd puppet cronjob
 	puppet resource cron puppet-agent ensure=present user=root minute=30 command='/usr/bin/puppet agent --onetime --no-daemonize --splay'
+}
+
+check_for_loginshell() {
+	while true; do
+		if [ "x$(ps aux | grep -i getty | grep tty)" != "x" ]; then
+			return
+		fi
+		sleep 1
+	done
 }
 
 check_network_connectivity() {
