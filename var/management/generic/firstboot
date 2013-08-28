@@ -1,5 +1,5 @@
 #!/bin/bash
-set -x
+#set -x
 
 DOWNLOAD=$(if [ -x "/usr/bin/wget" ]; then echo "/usr/bin/wget -O "; else if [ -x "/usr/bin/curl" ]; then echo "/usr/bin/curl -o "; fi; fi)
 
