@@ -124,7 +124,7 @@ check_network_connectivity() {
 	else
 		ifup eth0
 		while true; do
-			if [ "$(ip addr show eth0 | grep "inet ")"]
+			if [ "$(ip addr show eth0 | grep "inet ")" ]; then
 				echo "Network may be functional now">/dev/tty1
 				return
 			fi
