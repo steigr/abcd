@@ -6,11 +6,16 @@
       <confirm config:type="boolean">false</confirm>
     </mode>
   </general>
-    <users config:type="list">
-        <user>
-            <encrypted config:type="boolean">false</encrypted>
-            <user_password>@ROOTPASSWORD@</user_password>
-            <username>root</username>
-        </user>
-    </users>
+  <users config:type="list">
+      <user>
+          <encrypted config:type="boolean">false</encrypted>
+          <user_password>@ROOTPASSWORD@</user_password>
+          <username>root</username>
+      </user>
+  </users>
+  <software>
+    <packages config:type="list">
+      <package>zypper</package>
+    </packages>
+  </software>
 </profile>
