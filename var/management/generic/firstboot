@@ -2,6 +2,13 @@
 set -x
 set -e
 
+if [ "x$ABCD_WATCHDOG" = "x" ]; then
+	while true; do
+		ABCD_WATCHDOG=123$RANDOM $0 && exit 0
+		sleep 5
+	done
+fi
+
 DOWNLOAD=$(if [ -x "/usr/bin/wget" ]; then echo "/usr/bin/wget -O "; else if [ -x "/usr/bin/curl" ]; then echo "/usr/bin/curl -o "; fi; fi)
 
 notify_abcd() {
