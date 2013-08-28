@@ -64,12 +64,12 @@ firstboot_zypper_based() {
 	check_network_connectivity
 	notify_abcd firstboot start-script
 	notify_abcd firstboot install-software
-	zypper update -f -y
+	zypper update -y
 	notify_abcd firstboot update-hostname
 	system_update_hostname
 	PUPPETSERVER=@PUPPETSERVER@
 	notify_abcd puppet install
-	zypper install -y -f puppet
+	zypper install -y puppet
 	puppet_agent_config
 	puppet_agent_register
 	puppet_agent_cronjob
