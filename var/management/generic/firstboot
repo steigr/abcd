@@ -17,6 +17,7 @@ check_opensuse_11()		{ [[ "x$(grep -e "^openSUSE 11" /etc/SuSE-release)" 					!=
 check_opensuse_12()		{ [[ "x$(grep -e "^openSUSE 12" /etc/SuSE-release)" 					!= "x" ]] && echo true || echo false; }
 check_opensuse_13()		{ [[ "x$(grep -e "^openSUSE 13" /etc/SuSE-release)" 					!= "x" ]] && echo true || echo false; }
 check_debian_6()		{ [[ "x$(grep -e "6\." /etc/debian_version)"							!= "x" ]] && echo true || echo false; }
+check_debian_7()		{ [[ "x$(grep -e "7\." /etc/debian_version)"							!= "x" ]] && echo true || echo false; }
 check_debian_sid()		{ [[ "x$(grep -e "sid" /etc/debian_version)"							!= "x" ]] && echo true || echo false; }
 check_ubuntu() 			{ [[ "x$(ls /etc/ubuntu_version)"										!= "x" ]] && echo true || echo false; }
 check_gentoo()			{ [[ "x$(ls /etc/gentoo-release)"                                       != "x" ]] && echo true || echo false; }
@@ -32,7 +33,8 @@ os_selector() {
 	[[ "$(check_opensuse_11)"	= "true" ]] && ( firstboot_opensuse 11;			return )
 	[[ "$(check_opensuse_12)"	= "true" ]] && ( firstboot_opensuse 12;			return )
 	[[ "$(check_opensuse_13)"	= "true" ]] && ( firstboot_opensuse 13;			return )
-	[[ "$(check_debian_6)"		= "true" ]] && ( firstboot_apt_based wheezy;	return )
+	[[ "$(check_debian_6)"		= "true" ]] && ( firstboot_apt_based squeeze;	return )
+	[[ "$(check_debian_7)"		= "true" ]] && ( firstboot_apt_based wheezy;	return )
 	[[ "$(check_debian_sid)"	= "true" ]] && ( firstboot_apt_based sid;		return )
 	[[ "$(check_ubuntu)"		= "true" ]] && ( firstboot_apt_based raring;	return )
 	[[ "$(check_gentoo)"		= "true" ]] && ( firstboot_gentoo;				return )
