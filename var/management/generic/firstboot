@@ -158,6 +158,5 @@ finish() {
 	fi
 }
 
-sleep 60
 os_selector
 finish
