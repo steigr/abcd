@@ -1,7 +1,6 @@
 #!/bin/bash
 export PUPPET_COMPLETE=0
 set -x
-echo -e "\\nFirstboot-Script is executed" >/dev/tty1
 
 touch /tmp/firstboot.executed
 
@@ -27,6 +26,7 @@ check_fedora()			{ [[ "x$(ls /etc/fedora-release)"										!= "x" ]] && echo tr
 check_archlinux()		{ [[ "x$(ls /etc/arch-release)"											!= "x" ]] && echo true || echo false; }
 
 os_selector() {	
+	echo -e "\\nFirstboot-Script is executed" >/dev/tty1
 	[[ "$(check_centos_5)"		= "true" ]] && ( firstboot_yum_based 59;		return )
 	[[ "$(check_centos_6)"		= "true" ]] && ( firstboot_yum_based 64;		return )
 	[[ "$(check_fedora)"		= "true" ]] && ( firstboot_yum_based fedora;	return )
@@ -111,7 +111,7 @@ check_for_loginshell() {
 }
 
 check_network_connectivity() {
-	if [ -x /bin/ping ]; then
+	if [ -x "$(which ping)" ]; then
 		while true; do
 			TARGET=$(ip route list match 0.0.0.0/0 | cut -f3 -d" ")
 		  if [ "x$TARGET" != "x" ]; then
@@ -123,8 +123,13 @@ check_network_connectivity() {
 		echo "Network is up" >/dev/tty1
 	else
 		ifup eth0
-		sleep 60
-		echo "Network may be functional now">/dev/tty1
+		while true; do
+			if [ "$(ip addr show eth0 | grep "inet ")"]
+				echo "Network may be functional now">/dev/tty1
+				return
+			fi
+			sleep 1
+		done
 	fi
 }
 
@@ -153,5 +158,6 @@ finish() {
 	fi
 }
 
+sleep 60
 os_selector
 finish
