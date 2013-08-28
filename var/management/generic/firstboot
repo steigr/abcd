@@ -1,46 +1,53 @@
 #!/bin/bash
 set -x
 
-touch /tmp/firstboot.executed
-
-export DOWNLOAD=$(if [ -x "/usr/bin/wget" ]; then echo "/usr/bin/wget -O "; else if [ -x "/usr/bin/curl" ]; then echo "/usr/bin/curl -o "; fi; fi)
+DOWNLOAD=$(if [ -x "/usr/bin/wget" ]; then echo "/usr/bin/wget -O "; else if [ -x "/usr/bin/curl" ]; then echo "/usr/bin/curl -o "; fi; fi)
 
 notify_abcd() {
+	DOWNLOAD=$(if [ -x "/usr/bin/wget" ]; then echo "/usr/bin/wget -O "; else if [ -x "/usr/bin/curl" ]; then echo "/usr/bin/curl -o "; fi; fi)
 	$DOWNLOAD - -q @BASEURL@/notify/class/${1}/state/${2} >/dev/null
 }
 
-install_centos_5()		{ [[ "x$(grep -e "^CentOS Release 5." /etc/redhat-release)" 			!= "x" ]] && firstboot_yum_based 59			}
-install_centos_6()		{ [[ "x$(grep -e "^CentOS Release 6." /etc/centos-release)" 			!= "x" ]] && firstboot_yum_based 64			}
-install_sles_10()		{ [[ "x$(grep -e "^SUSE Linux Enterprise Server 10" /etc/SuSE-release)" != "x" ]] && firstboot_zypper_based 10		}
-install_sles_11()		{ [[ "x$(grep -e "^SUSE Linux Enterprise Server 11" /etc/SuSE-release)" != "x" ]] && firstboot_zypper_based 11		}
-install_opensuse_11()	{ [[ "x$(grep -e "^openSUSE 11" /etc/SuSE-release)" 					!= "x" ]] && firstboot_zypper_based 11		}
-install_opensuse_12()	{ [[ "x$(grep -e "^openSUSE 12" /etc/SuSE-release)" 					!= "x" ]] && firstboot_zypper_based 12		}
-install_opensuse_13()	{ [[ "x$(grep -e "^openSUSE 13" /etc/SuSE-release)" 					!= "x" ]] && firstboot_zypper_based 13		}
-install_debian_6()		{ [[ "x$(grep -e "6\." /etc/debian_version)"							!= "x" ]] && firstboot_apt_based squeeze	}
-install_debian_7()		{ [[ "x$(grep -e "7\." /etc/debian_version)"							!= "x" ]] && firstboot_apt_based wheezy		}
-install_debian_sid()	{ [[ "x$(grep -e "sid" /etc/debian_version)"							!= "x" ]] && firstboot_apt_based unstable	}
-install_ubuntu() 		{ [[ "x$(ls /etc/ubuntu_version)"										!= "x" ]] && firstboot_apt_based quantal	}
-install_fedora()		{ [[ "x$(ls /etc/fedora-release)"										!= "x" ]] && firstboot_yum_based 13			}
-install_gentoo()		{ [[ "x$(ls /etc/gentoo-release)"                                       != "x" ]] && firstboot_emerge_based			}
-install_archlinux()		{ [[ "x$(ls /etc/arch-release)"											!= "x" ]] && firstboot_pacman_based			}
+check_release() {
+	FILE="${1}"
+	STRING="${2}"
+	ls "${FILE}" 2>&1 >/dev/null && \
+	grep -e "${STRING}" "${FILE}" 2>&1 >/dev/null && \
+	return 0
+	return 1
+}
 
 os_selector() {	
 	echo -e "\\nFirstboot-Script is executed" >/dev/tty1
 
-	install_centos_5
-	install_centos_6
-	install_fedora
-	install_sles_10
-	install_sles_11
-	install_opensuse_11
-	install_opensuse_12
-	install_opensuse_13
-	install_debian_6
-	install_debian_7
-	install_debian_sid
-	install_ubuntu
-	install_gentoo
-	install_archlinux
+	check_release "^CentOS Release 5." /etc/redhat-release && \
+		firstboot_yum_based 59
+	grep -e "^CentOS Release 6." /etc/centos-release >/dev/null && \
+		firstboot_yum_based 64
+	grep -e "^SUSE Linux Enterprise Server 10" /etc/SuSE-release >/dev/null && \
+		firstboot_zypper_based 10
+	grep -e "^SUSE Linux Enterprise Server 11" /etc/SuSE-release >/dev/null && \
+		firstboot_zypper_based 11	
+	grep -e "^openSUSE 11" /etc/SuSE-release >/dev/null && \
+		firstboot_zypper_based 11	
+	grep -e "^openSUSE 12" /etc/SuSE-release >/dev/null && \
+		firstboot_zypper_based 12	
+	grep -e "^openSUSE 13" /etc/SuSE-release >/dev/null && \
+		firstboot_zypper_based 13	
+	grep -e "6\." /etc/debian_version >/dev/null && \
+		firstboot_apt_based squeeze
+	grep -e "7\." /etc/debian_version >/dev/null && \
+		firstboot_apt_based wheezy	
+	grep -e "sid" /etc/debian_version >/dev/null && \
+		firstboot_apt_based unstable
+	ls /etc/ubuntu_version >/dev/null && \
+		firstboot_apt_based quantal
+	ls /etc/fedora-release >/dev/null && \
+		firstboot_yum_based 13		
+	ls /etc/gentoo-release >/dev/null && \
+		firstboot_emerge_based		
+	ls /etc/arch-release >/dev/null && \
+		firstboot_pacman_based
 }
 
 firstboot_apt_based() {
