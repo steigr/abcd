@@ -13,8 +13,8 @@ check_centos_5()		{ [[ "x$(grep -e "^CentOS Release 5." /etc/redhat-release)" 		
 check_centos_6()		{ [[ "x$(grep -e "^CentOS Release 6." /etc/centos-release)" 			!= "x" ]] && echo true || echo false; }
 check_sles_10()			{ [[ "x$(grep -e "^SUSE Linux Enterprise Server 10" /etc/SuSE-release)" != "x" ]] && echo true || echo false; }
 check_sles_11()			{ [[ "x$(grep -e "^SUSE Linux Enterprise Server 11" /etc/SuSE-release)" != "x" ]] && echo true || echo false; }
-check_opensuse_11() 	{ [[ "x$(grep -e "^openSUSE 11" /etc/SuSE-release)" 					!= "x" ]] && echo true || echo false; }
-check_opensuse_12() 	{ [[ "x$(grep -e "^openSUSE 12" /etc/SuSE-release)" 					!= "x" ]] && echo true || echo false; }
+check_opensuse_11()		{ [[ "x$(grep -e "^openSUSE 11" /etc/SuSE-release)" 					!= "x" ]] && echo true || echo false; }
+check_opensuse_12()		{ [[ "x$(grep -e "^openSUSE 12" /etc/SuSE-release)" 					!= "x" ]] && echo true || echo false; }
 check_opensuse_13()		{ [[ "x$(grep -e "^openSUSE 13" /etc/SuSE-release)" 					!= "x" ]] && echo true || echo false; }
 check_debian_6()		{ [[ "x$(grep -e "6\." /etc/debian_version)"							!= "x" ]] && echo true || echo false; }
 check_debian_sid()		{ [[ "x$(grep -e "sid" /etc/debian_version)"							!= "x" ]] && echo true || echo false; }
@@ -28,7 +28,7 @@ os_selector() {
 	[[ "$(check_centos_6)"		= "true" ]] && ( firstboot_yum_based 64;		return )
 	[[ "$(check_fedora)"		= "true" ]] && ( firstboot_yum_based fedora;	return )
 	[[ "$(check_sles_10)"		= "true" ]] && ( firstboot_sles 10; 			return )
-	[[ "$(check_sles_11)"  		= "true" ]] && ( firstboot_sles 11;				return )
+	[[ "$(check_sles_11)"		= "true" ]] && ( firstboot_sles 11;				return )
 	[[ "$(check_opensuse_11)"	= "true" ]] && ( firstboot_opensuse 11;			return )
 	[[ "$(check_opensuse_12)"	= "true" ]] && ( firstboot_opensuse 12;			return )
 	[[ "$(check_opensuse_13)"	= "true" ]] && ( firstboot_opensuse 13;			return )
