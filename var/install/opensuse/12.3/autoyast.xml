@@ -17,6 +17,9 @@
     <packages config:type="list">
       <package>zypper</package>
     </packages>
+    <do_online_update config:type="boolean">true</do_online_update>
   </software>
-  <do_online_update config:type="boolean">true</do_online_update>
+  <networking>
+    <keep_install_network config:type="boolean">true</keep_install_network>
+  </networking>
 </profile>
