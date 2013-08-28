@@ -59,7 +59,7 @@ firstboot_apt_based() {
 puppet_agent_config() {
 	echo > /etc/puppet/puppet.conf
 	echo "[agent]" >> /etc/puppet/puppet.conf
-	echo "server=puppet.$MYDOMAIN" >> /etc/puppet/puppet.conf
+	echo "server=@PUPPETSERVER@" >> /etc/puppet/puppet.conf
 	echo "report=true" >> /etc/puppet/puppet.conf
 	echo "pluginsync=true" >> /etc/puppet/puppet.conf
 	echo "certname=$MYFQDN" >> /etc/puppet/puppet.conf
