@@ -1,5 +1,5 @@
 #!/bin/bash
 
 [[ -f "${LIBEXEC}/${OPERATION}/${CLASS}" ]] \
-&& . "${LIBEXEC}/${OPERATION}/${CLASS}" \
+&& ( abcd_logger "Notification from $REMOTE_ADDR : $CLASS / $STATE" ;. "${LIBEXEC}/${OPERATION}/${CLASS}"; ) \
 || http_error 501
