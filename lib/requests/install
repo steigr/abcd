@@ -4,13 +4,13 @@ case "x${PART}" in
 	xkernel)
 		KERNEL=$(find_kernel_image "${FILE_LOCATION}/${OPERATION}/${VARIANT}/${RELEASE}")
 		[[ "x${KERNEL}" != "x" ]] \
-		&& http_get "${KERNEL}" \
+		&& ( http_get "${KERNEL}"; abcd_logger "send install/${VARIANT}/${RELEASE}/${PART}" ) \
 		|| http_error 404
 	;;
 	xinitrd)
 		INITRD=$(find_initrd_image "${FILE_LOCATION}/${OPERATION}/${VARIANT}/${RELEASE}")
 		[[ "x${INITRD}" != "x" ]] \
-		&& http_get "${INITRD}" \
+		&& ( http_get "${INITRD}"; abcd_logger "send install/${VARIANT}/${RELEASE}/${PART}" ) \
 		|| http_error 404
 	;;
 	xconfiguration)
