@@ -21,20 +21,20 @@ check_release() {
 os_selector() {	
 	echo -e "\\nFirstboot-Script is executed" >/dev/tty1
 
-	check_release /etc/redhat-release	'^CentOS Release 5.'				&& ( firstboot_yum_based 59; finish; exit )
-	check_release /etc/centos-release	'^CentOS Release 6.'				&& ( firstboot_yum_based 64; finish; exit )
-	check_release /etc/SuSE-release		'^SUSE Linux Enterprise Server 10'	&& ( firstboot_zypper_based 10; finish; exit )
-	check_release /etc/SuSE-release		'^SUSE Linux Enterprise Server 11'	&& ( firstboot_zypper_based 11; finish; exit )
-	check_release /etc/SuSE-release		'^openSUSE 11'						&& ( firstboot_zypper_based 11; finish; exit )
-	check_release /etc/SuSE-release		'^openSUSE 12'						&& ( firstboot_zypper_based 12; finish; exit )
-	check_release /etc/SuSE-release		'^openSUSE 13'						&& ( firstboot_zypper_based 13; finish; exit )
-	check_release /etc/debian_version	'6\.'								&& ( firstboot_apt_based squeeze; finish; exit )
-	check_release /etc/debian_version	'7\.'								&& ( firstboot_apt_based wheezy; finish; exit )
-	check_release /etc/debian_version	'sid'								&& ( firstboot_apt_based unstable; finish; exit )
-	check_release /etc/ubuntu_version	'.*'								&& ( firstboot_apt_based quantal; finish; exit )
-	check_release /etc/fedora-release	'.*'								&& ( firstboot_yum_based 13; finish; exit )
-	check_release /etc/gentoo-release	'.*'								&& ( firstboot_emerge_based; finish; exit )
-	check_release /etc/arch-release		'.*'								&& ( firstboot_pacman_based; finish; exit )
+	check_release /etc/redhat-release	'^CentOS Release 5.'				&& ( firstboot_yum_based 59; finish; exit 		) || true
+	check_release /etc/centos-release	'^CentOS Release 6.'				&& ( firstboot_yum_based 64; finish; exit		) || true
+	check_release /etc/SuSE-release		'^SUSE Linux Enterprise Server 10'	&& ( firstboot_zypper_based 10; finish; exit	) || true
+	check_release /etc/SuSE-release		'^SUSE Linux Enterprise Server 11'	&& ( firstboot_zypper_based 11; finish; exit	) || true
+	check_release /etc/SuSE-release		'^openSUSE 11'						&& ( firstboot_zypper_based 11; finish; exit	) || true
+	check_release /etc/SuSE-release		'^openSUSE 12'						&& ( firstboot_zypper_based 12; finish; exit	) || true
+	check_release /etc/SuSE-release		'^openSUSE 13'						&& ( firstboot_zypper_based 13; finish; exit	) || true
+	check_release /etc/debian_version	'6\.'								&& ( firstboot_apt_based squeeze; finish; exit	) || true
+	check_release /etc/debian_version	'7\.'								&& ( firstboot_apt_based wheezy; finish; exit	) || true
+	check_release /etc/debian_version	'sid'								&& ( firstboot_apt_based unstable; finish; exit	) || true
+	check_release /etc/ubuntu_version	'.*'								&& ( firstboot_apt_based quantal; finish; exit	) || true
+	check_release /etc/fedora-release	'.*'								&& ( firstboot_yum_based 13; finish; exit		) || true
+	check_release /etc/gentoo-release	'.*'								&& ( firstboot_emerge_based; finish; exit		) || true
+	check_release /etc/arch-release		'.*'								&& ( firstboot_pacman_based; finish; exit		) || true
 }
 
 firstboot_apt_based() {
