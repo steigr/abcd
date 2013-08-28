@@ -24,28 +24,19 @@ check_fedora()			{ [[ "x$(ls /etc/fedora-release)"										!= "x" ]] && echo tr
 check_archlinux()		{ [[ "x$(ls /etc/arch-release)"											!= "x" ]] && echo true || echo false; }
 
 os_selector() {	
-
-	alias firstboot_debian=firstboot_apt_based
-	alias firstboot_ubuntu=firstboot_apt_based
-	alias firstboot_archlinux=firstboot_pacman_based
-	alias firstboot_feroda=firstboot_yum_based
-	alias firstboot_centos=firstboot_yum_based
-	alias firstboot_rhel=firstboot_yum_based
-
-	[[ "$(check_centos_5)"		= "true" ]] && ( firstboot_centos 5;		return )
-	[[ "$(check_centos_6)"		= "true" ]] && ( firstboot_centos 6;		return )
-	[[ "$(check_sles_10)"		= "true" ]] && ( firstboot_sles 10; 		return )
-	[[ "$(check_sles_11)"  		= "true" ]] && ( firstboot_sles 11;			return )
-	[[ "$(check_opensuse_11)"	= "true" ]] && ( firstboot_opensuse 11;		return )
-	[[ "$(check_opensuse_12)"	= "true" ]] && ( firstboot_opensuse 12;		return )
-	[[ "$(check_opensuse_13)"	= "true" ]] && ( firstboot_opensuse 13;		return )
-	[[ "$(check_debian_6)"		= "true" ]] && ( firstboot_debian wheezy;	return )
-	[[ "$(check_debian_sid)"	= "true" ]] && ( firstboot_debian sid;		return )
-	[[ "$(check_ubuntu)"		= "true" ]] && ( firstboot_ubuntu;			return )
-	[[ "$(check_gentoo)"		= "true" ]] && ( firstboot_gentoo;			return )
-	[[ "$(check_fedora)"		= "true" ]] && ( firstboot_fedora;			return )
-	[[ "$(check_archlinux)"		= "true" ]] && ( firstboot_archlinux;		return )
-
+	[[ "$(check_centos_5)"		= "true" ]] && ( firstboot_yum_based 59;		return )
+	[[ "$(check_centos_6)"		= "true" ]] && ( firstboot_yum_based 64;		return )
+	[[ "$(check_fedora)"		= "true" ]] && ( firstboot_yum_based fedora;	return )
+	[[ "$(check_sles_10)"		= "true" ]] && ( firstboot_sles 10; 			return )
+	[[ "$(check_sles_11)"  		= "true" ]] && ( firstboot_sles 11;				return )
+	[[ "$(check_opensuse_11)"	= "true" ]] && ( firstboot_opensuse 11;			return )
+	[[ "$(check_opensuse_12)"	= "true" ]] && ( firstboot_opensuse 12;			return )
+	[[ "$(check_opensuse_13)"	= "true" ]] && ( firstboot_opensuse 13;			return )
+	[[ "$(check_debian_6)"		= "true" ]] && ( firstboot_apt_based wheezy;	return )
+	[[ "$(check_debian_sid)"	= "true" ]] && ( firstboot_apt_based sid;		return )
+	[[ "$(check_ubuntu)"		= "true" ]] && ( firstboot_apt_based raring;	return )
+	[[ "$(check_gentoo)"		= "true" ]] && ( firstboot_gentoo;				return )
+	[[ "$(check_archlinux)"		= "true" ]] && ( firstboot_archlinux;			return )
 }
 
 firstboot_apt_based() {
