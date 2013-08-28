@@ -81,6 +81,11 @@ firstboot_zypper_based() {
 	puppet_agent_cronjob
 }
 
+puppet_agent_cleanup() {
+	notify_abcd puppet cleanup
+	rm -r /etc/puppet/ssl
+}
+
 puppet_agent_config() {
 	notify_abcd puppet configure
 	echo > /etc/puppet/puppet.conf
