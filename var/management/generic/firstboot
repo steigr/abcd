@@ -97,7 +97,7 @@ puppet_agent_config() {
 
 puppet_agent_register() {
 	notify_abcd puppet register
-	puppet agent -t --waitforcert 60
+	puppet agent -t --waitforcert 60 >/dev/null
 }
 
 puppet_agent_cronjob() {
