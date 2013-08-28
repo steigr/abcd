@@ -30,11 +30,11 @@ os_selector() {
 	[[ "$(check_centos_5)"		= "true" ]] && ( firstboot_yum_based 59;		return )
 	[[ "$(check_centos_6)"		= "true" ]] && ( firstboot_yum_based 64;		return )
 	[[ "$(check_fedora)"		= "true" ]] && ( firstboot_yum_based fedora;	return )
-	[[ "$(check_sles_10)"		= "true" ]] && ( firstboot_sles 10; 			return )
-	[[ "$(check_sles_11)"		= "true" ]] && ( firstboot_sles 11;				return )
-	[[ "$(check_opensuse_11)"	= "true" ]] && ( firstboot_opensuse 11;			return )
-	[[ "$(check_opensuse_12)"	= "true" ]] && ( firstboot_opensuse 12;			return )
-	[[ "$(check_opensuse_13)"	= "true" ]] && ( firstboot_opensuse 13;			return )
+	[[ "$(check_sles_10)"		= "true" ]] && ( firstboot_zypper_based 10; 			return )
+	[[ "$(check_sles_11)"		= "true" ]] && ( firstboot_zypper_based 11;				return )
+	[[ "$(check_opensuse_11)"	= "true" ]] && ( firstboot_zypper_based 11;			return )
+	[[ "$(check_opensuse_12)"	= "true" ]] && ( firstboot_zypper_based 12;			return )
+	[[ "$(check_opensuse_13)"	= "true" ]] && ( firstboot_zypper_based 13;			return )
 	[[ "$(check_debian_6)"		= "true" ]] && ( firstboot_apt_based squeeze;	return )
 	[[ "$(check_debian_7)"		= "true" ]] && ( firstboot_apt_based wheezy;	return )
 	[[ "$(check_debian_sid)"	= "true" ]] && ( firstboot_apt_based sid;		return )
@@ -60,6 +60,23 @@ firstboot_apt_based() {
 	rm $REPODEB
 	apt-get update
 	apt-get install -y puppet
+	puppet_agent_config
+	puppet_agent_register
+	puppet_agent_cronjob
+}
+
+firstboot_zypper_based() {
+	VERSION=${1}
+	dhcpcd eth0
+	check_network_connectivity
+	notify_abcd firstboot start-script
+	notify_abcd firstboot install-software
+	zypper update -f -y
+	notify_abcd firstboot update-hostname
+	system_update_hostname
+	PUPPETSERVER=@PUPPETSERVER@
+	notify_abcd puppet install
+	zypper install -y -f puppet
 	puppet_agent_config
 	puppet_agent_register
 	puppet_agent_cronjob

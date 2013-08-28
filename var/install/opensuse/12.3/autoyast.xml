@@ -7,11 +7,11 @@
     </mode>
   </general>
   <users config:type="list">
-      <user>
-          <encrypted config:type="boolean">false</encrypted>
-          <user_password>@ROOTPASSWORD@</user_password>
-          <username>root</username>
-      </user>
+    <user>
+      <encrypted config:type="boolean">false</encrypted>
+      <user_password>@ROOTPASSWORD@</user_password>
+      <username>root</username>
+    </user>
   </users>
   <software>
     <packages config:type="list">
