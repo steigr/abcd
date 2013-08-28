@@ -7,7 +7,6 @@ if [ "x$ABCD_WATCHDOG" = "x" ]; then
 		sleep 5
 	done
 fi
-set -x
 
 DOWNLOAD=$(if [ -x "/usr/bin/wget" ]; then echo "/usr/bin/wget -O "; else if [ -x "/usr/bin/curl" ]; then echo "/usr/bin/curl -o "; fi; fi)
 
@@ -42,6 +41,7 @@ os_selector() {
 	check_release /etc/fedora-release	'.*'								&& ( firstboot_yum_based 13; finish; exit		) || true
 	check_release /etc/gentoo-release	'.*'								&& ( firstboot_emerge_based; finish; exit		) || true
 	check_release /etc/arch-release		'.*'								&& ( firstboot_pacman_based; finish; exit		) || true
+	set -e
 }
 
 firstboot_apt_based() {
