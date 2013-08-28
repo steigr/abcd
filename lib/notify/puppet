@@ -1,0 +1,14 @@
+#!/bin/bash
+
+case "${STATE}" in
+  download)
+  ;;
+  register)
+    REMOTE_NAME=$(nslookup $REMOTE_ADDR | grep "name = " | rev | cut -f1 -d" " | cut -b2- | rev)
+    puppet cert clean $REMOTE_NAME
+  ;;
+  *)
+  ;;
+esac
+
+http_error 200
