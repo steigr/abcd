@@ -153,6 +153,7 @@ IPXE_BOOT_SCRIPT
 }
 
 install_abcd_downloader() {
+  apt-get install curl -y
   rm -rf /etc/abcd/downloads.d
   git clone git://github.com/steigr/abcd-downloader.git /etc/abcd/downloads.d
   rm $(which abcd-downloader)
