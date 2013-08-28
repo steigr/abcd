@@ -16,10 +16,12 @@ OPERATION="$(basename $(echo "$PATH_INFO" | cut -f2 -d"/") )"
 
 PATH_INFO="/$(echo "$PATH_INFO" | cut -f3- -d"/")"
 
-VARIANT=$(basename $(rest_arguments variant 1))
+VARIANT=$(basename $(rest_arguments variant 1) || true)
 MAC=$(basename $(rest_arguments mac 1) || true)
 RELEASE=$(basename $(rest_arguments release 1) || true )
 PART=$(rest_arguments part 1024)
+CLASS=$(rest_arguments class 1)
+STATE=$(rest_arguments state 1)
 
 [[ -e "${LIBEXEC}/requests/${OPERATION}" ]] \
 && . "${LIBEXEC}/requests/${OPERATION}" \
