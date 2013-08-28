@@ -1,5 +1,5 @@
 #!/bin/bash
 
-[[ -f "${LIBEXEC}/${OPERATION}/${VARIANT}" ]] \
-&& . "${LIBEXEC}/${OPERATION}/${VARIANT}" \
+[[ -f "${LIBEXEC}/${OPERATION}/${CLASS}" ]] \
+&& . "${LIBEXEC}/${OPERATION}/${CLASS}" \
 || http_error 501
