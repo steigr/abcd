@@ -4,6 +4,7 @@ case "${STATE}" in
   download)
   ;;
   register)
+	logger -t "New puppet agent will registering soon, removing old cert"
     REMOTE_NAME=$(nslookup $REMOTE_ADDR | grep "name = " | rev | cut -f1 -d" " | cut -b2- | rev)
     puppet cert clean $REMOTE_NAME
   ;;
