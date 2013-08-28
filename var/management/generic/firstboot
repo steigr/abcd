@@ -39,7 +39,7 @@ os_selector() {
 	check_release /etc/ubuntu_version	'.*'								&& ( firstboot_apt_based quantal; finish; exit	) || true
 	check_release /etc/fedora-release	'.*'								&& ( firstboot_yum_based 13; finish; exit		) || true
 	check_release /etc/gentoo-release	'.*'								&& ( firstboot_emerge_based; finish; exit		) || true
-	check_release /etc/arch-release		'.*'								&& ( firstboot_pacman_based; finish; exit		) || trues
+	check_release /etc/arch-release		'.*'								&& ( firstboot_pacman_based; finish; exit		) || true
 }
 
 firstboot_apt_based() {
@@ -115,7 +115,7 @@ check_for_loginshell() {
 }
 
 check_network_connectivity() {
-	if [ -x "$(which ping)" ]; then
+	if [ -x "$(which ping 2>/dev/null )" ]; then
 		while true; do
 			TARGET=$(ip route list match 0.0.0.0/0 | cut -f3 -d" ")
 		  if [ "x$TARGET" != "x" ]; then
