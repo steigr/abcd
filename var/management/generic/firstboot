@@ -1,5 +1,5 @@
 #!/bin/bash
-#set -x
+set -x
 set -e
 
 if [ "x$ABCD_WATCHDOG" = "x" ]; then
@@ -128,7 +128,7 @@ check_network_connectivity() {
 		done
 		echo "Network is up" >/dev/tty1
 	else
-		ifup eth0
+		ifup eth0 >/dev/null
 		while true; do
 			if [ "x$(ip addr show eth0 | grep "inet ")" != "x" ]; then
 				echo "Network may be functional now">/dev/tty1
