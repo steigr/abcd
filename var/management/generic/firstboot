@@ -1,5 +1,4 @@
 #!/bin/bash
-export PUPPET_COMPLETE=0
 set -x
 
 touch /tmp/firstboot.executed
@@ -157,10 +156,6 @@ system_update_hostname() {
 
 finish() {
 	notify_abcd firstboot finished
-	if [ "x$PUPPET_COMPLETE" = "x1" ];then
-		rm $0
-		#reboot
-	fi
 }
 
 os_selector
