@@ -4,7 +4,7 @@ set -x
 
 touch /tmp/firstboot.executed
 
-DOWNLOAD=$(if [ -x "/usr/bin/wget" ]; then echo "/usr/bin/wget -O "; else if [ -x "/usr/bin/curl" ]; then echo "/usr/bin/curl -o "; fi; fi)
+export DOWNLOAD=$(if [ -x "/usr/bin/wget" ]; then echo "/usr/bin/wget -O "; else if [ -x "/usr/bin/curl" ]; then echo "/usr/bin/curl -o "; fi; fi)
 
 notify_abcd() {
 	$DOWNLOAD - -q @BASEURL@/notify/class/${1}/state/${2} >/dev/null
