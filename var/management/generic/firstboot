@@ -64,6 +64,7 @@ firstboot_apt_based() {
 }
 
 firstboot_zypper_based() {
+	sleep 90
 	VERSION=${1}
 	check_for_loginshell
 	check_network_connectivity
