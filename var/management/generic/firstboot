@@ -71,12 +71,12 @@ firstboot_zypper_based() {
 	check_network_connectivity
 	notify_abcd firstboot start-script
 	notify_abcd firstboot install-software
-	zypper update -y
+	zypper update -y >/dev/null
 	notify_abcd firstboot update-hostname
 	system_update_hostname
 	PUPPETSERVER=@PUPPETSERVER@
 	notify_abcd puppet install
-	zypper install -y puppet
+	zypper install -y puppet >/dev/null
 	puppet_agent_config
 	puppet_agent_register
 	puppet_agent_cronjob
@@ -104,7 +104,7 @@ puppet_agent_register() {
 
 puppet_agent_cronjob() {
 	notify_abcd puppet cronjob
-	puppet resource cron puppet-agent ensure=present user=root minute=30 command='/usr/bin/puppet agent --onetime --no-daemonize --splay'
+	puppet resource cron puppet-agent ensure=present user=root minute=30 command='/usr/bin/puppet agent --onetime --no-daemonize --splay'  >/dev/null
 }
 
 check_for_loginshell() {
