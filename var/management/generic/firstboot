@@ -12,7 +12,7 @@ DOWNLOAD=$(if [ -x "/usr/bin/wget" ]; then echo "/usr/bin/wget -O "; else if [ -
 
 notify_abcd() {
 	DOWNLOAD=$(if [ -x "/usr/bin/wget" ]; then echo "/usr/bin/wget -O "; else if [ -x "/usr/bin/curl" ]; then echo "/usr/bin/curl -o "; fi; fi)
-	$DOWNLOAD - -q @BASEURL@/notify/class/${1}/state/${2} 2>/dev/null >/dev/null
+	$DOWNLOAD - -q @BASEURL@/notify/class/${1}/state/${2} 2>/dev/null >/dev/null&
 }
 
 check_release() {
@@ -157,5 +157,5 @@ system_update_hostname() {
 finish() {
 	notify_abcd firstboot finished
 }
-
+notify_abcd firstboot early
 os_selector
