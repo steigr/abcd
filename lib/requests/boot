@@ -2,4 +2,4 @@
 
 [[ -f "${LIBEXEC}/${OPERATION}/${VARIANT}" ]] \
 && . "${LIBEXEC}/${OPERATION}/${VARIANT}" \
-|| http_error 501
+|| http_error 500
