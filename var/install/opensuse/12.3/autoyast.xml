@@ -21,5 +21,12 @@
   </software>
   <networking>
     <keep_install_network config:type="boolean">true</keep_install_network>
+    <interfaces config:type="list">
+      <interface>
+        <bootproto>dhcp</bootproto>
+        <device>eth0</device>        
+        <startmode>onboot</startmode>
+      </interface>
+    </interfaces>
   </networking>
 </profile>
