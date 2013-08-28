@@ -45,6 +45,7 @@ firstboot_apt_based() {
 	VERSION=${1}
 	ifup eth0
 	check_network_connectivity
+	apt-get update && apt-get install -y bind9-host
 	system_update_hostname
 	PUPPETSERVER=@PUPPETSERVER@
 	REPODEB=/tmp/puppet-$$.deb
