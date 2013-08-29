@@ -11,8 +11,12 @@ fi
 DOWNLOAD=$(if [ -x "/usr/bin/wget" ]; then echo "/usr/bin/wget -O "; else if [ -x "/usr/bin/curl" ]; then echo "/usr/bin/curl -o "; fi; fi)
 
 notify_abcd() {
+	notify_abcd_s "${1}" "${2}"&
+}
+
+notify_abcd_s() {
 	DOWNLOAD=$(if [ -x "/usr/bin/wget" ]; then echo "/usr/bin/wget -O "; else if [ -x "/usr/bin/curl" ]; then echo "/usr/bin/curl -o "; fi; fi)
-	$DOWNLOAD - -q @BASEURL@/notify/class/${1}/state/${2} 2>/dev/null >/dev/null&
+	$DOWNLOAD - -q @BASEURL@/notify/class/${1}/state/${2} 2>/dev/null >/dev/null
 }
 
 check_release() {
@@ -26,20 +30,20 @@ check_release() {
 
 os_selector() {	
 	echo -e "\\nFirstboot-Script is executed" >/dev/tty1
-	check_release /etc/redhat-release	'^CentOS Release 5.'				&& ( firstboot_yum_based 59; finish; exit 		) || true
-	check_release /etc/centos-release	'^CentOS Release 6.'				&& ( firstboot_yum_based 64; finish; exit		) || true
-	check_release /etc/SuSE-release		'^SUSE Linux Enterprise Server 10'	&& ( firstboot_zypper_based 10; finish; exit	) || true
-	check_release /etc/SuSE-release		'^SUSE Linux Enterprise Server 11'	&& ( firstboot_zypper_based 11; finish; exit	) || true
-	check_release /etc/SuSE-release		'^openSUSE 11'						&& ( firstboot_zypper_based 11; finish; exit	) || true
-	check_release /etc/SuSE-release		'^openSUSE 12'						&& ( firstboot_zypper_based 12; finish; exit	) || true
-	check_release /etc/SuSE-release		'^openSUSE 13'						&& ( firstboot_zypper_based 13; finish; exit	) || true
-	check_release /etc/debian_version	'6\.'								&& ( firstboot_apt_based squeeze; finish; exit	) || true
-	check_release /etc/debian_version	'7\.'								&& ( firstboot_apt_based wheezy; finish; exit	) || true
-	check_release /etc/debian_version	'sid'								&& ( firstboot_apt_based unstable; finish; exit	) || true
-	check_release /etc/ubuntu_version	'.*'								&& ( firstboot_apt_based quantal; finish; exit	) || true
-	check_release /etc/fedora-release	'.*'								&& ( firstboot_yum_based 13; finish; exit		) || true
-	check_release /etc/gentoo-release	'.*'								&& ( firstboot_emerge_based; finish; exit		) || true
-	check_release /etc/arch-release		'.*'								&& ( firstboot_pacman_based; finish; exit		) || true
+	check_release /etc/redhat-release	'^CentOS Release 5.'				&& ( firstboot_yum_based 59;		finish; exit; ) || true
+	check_release /etc/centos-release	'^CentOS Release 6.'				&& ( firstboot_yum_based 64;		finish; exit; ) || true
+	check_release /etc/SuSE-release		'^SUSE Linux Enterprise Server 10'	&& ( firstboot_zypper_based 10;		finish; exit; ) || true
+	check_release /etc/SuSE-release		'^SUSE Linux Enterprise Server 11'	&& ( firstboot_zypper_based 11;		finish; exit; ) || true
+	check_release /etc/SuSE-release		'^openSUSE 11'						&& ( firstboot_zypper_based 11;		finish; exit; ) || true
+	check_release /etc/SuSE-release		'^openSUSE 12'						&& ( firstboot_zypper_based 12;		finish; exit; ) || true
+	check_release /etc/SuSE-release		'^openSUSE 13'						&& ( firstboot_zypper_based 13;		finish; exit; ) || true
+	check_release /etc/debian_version	'6\.'								&& ( firstboot_apt_based squeeze;	finish; exit; ) || true
+	check_release /etc/debian_version	'7\.'								&& ( firstboot_apt_based wheezy;	finish; exit; ) || true
+	check_release /etc/debian_version	'sid'								&& ( firstboot_apt_based unstable;	finish; exit; ) || true
+	check_release /etc/ubuntu_version	'.*'								&& ( firstboot_apt_based quantal;	finish; exit; ) || true
+	check_release /etc/fedora-release	'.*'								&& ( firstboot_yum_based 13;		finish; exit; ) || true
+	check_release /etc/gentoo-release	'.*'								&& ( firstboot_emerge_based;		finish; exit; ) || true
+	check_release /etc/arch-release		'.*'								&& ( firstboot_pacman_based;		finish; exit; ) || true
 }
 
 firstboot_apt_based() {
@@ -58,13 +62,13 @@ firstboot_apt_based() {
 	rm $REPODEB
 	apt-get update
 	apt-get install -y puppet
+	puppet_agent_cleanup
 	puppet_agent_config
 	puppet_agent_register
 	puppet_agent_cronjob
 }
 
 firstboot_zypper_based() {
-	sleep 90
 	VERSION=${1}
 	check_for_loginshell
 	check_network_connectivity
@@ -76,6 +80,7 @@ firstboot_zypper_based() {
 	PUPPETSERVER=@PUPPETSERVER@
 	notify_abcd puppet install
 	zypper install -y puppet >/dev/null
+	puppet_agent_cleanup
 	puppet_agent_config
 	puppet_agent_register
 	puppet_agent_cronjob
@@ -97,7 +102,7 @@ puppet_agent_config() {
 }
 
 puppet_agent_register() {
-	notify_abcd puppet register
+	notify_abcd_s puppet register
 	puppet agent -t --waitforcert 60 >/dev/null
 }
 
