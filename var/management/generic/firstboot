@@ -161,7 +161,7 @@ system_update_hostname() {
 }
 
 finish() {
-	clear >/dev/tty || true
+	clear >/dev/tty1 || true
 	notify_abcd firstboot finished
 }
 notify_abcd firstboot early
