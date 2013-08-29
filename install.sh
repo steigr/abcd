@@ -58,9 +58,14 @@ ask_install_abcd_downloader() {
   read INSTALL_ABCDDOWNLOADER
 }
 
+ask_install_and_config_sudo() {
+  echo -n "Install and Configure SUDO to allow www-data to run puppet as root (used for certificate-management) (y/n): "
+  read INSTALL_SUDO
+}
+
 install_packages() {
   apt-get update -q
-  apt-get install -y -q bind9-host
+  apt-get install -y -q bind9-host sudo
 }
 
 install_bind9() {
@@ -96,6 +101,14 @@ EOF_LIGHTTPD_CONF
 
 install_atftpd() {
   apt-get install -y atftpd
+}
+
+install_and_config_sudo() {
+  apt-get install -y sudo
+  cat >/etc/sudoers.d/abcd <<'EOSUDO'
+Cmnd_Alias PUPPET=/usr/bin/puppet
+www-data ALL=NOPASSWD:PUPPET
+EOSUDO
 }
 
 install_lhtfs() {
@@ -173,11 +186,13 @@ case "$1" in
     INSTALL_LIGHTTPD=y
     INSTALL_IPXE=y
     INSTALL_ABCDDOWNLOADER=y
+    INSTALL_SUDO=y
   ;;
   *)
     display_welcomemsg
     ask_domainname
     ask_bootserver
+    ask_install_and_config_sudo
     ask_install_bind9
     ask_install_dhcpd
     ask_install_lighttpd
@@ -187,14 +202,16 @@ case "$1" in
   ;;
 esac
 
-install_packages
-install_lhtfs
-[[ "x${INSTALL_BIND9}" = "xy" ]] && install_bind9
-[[ "x${INSTALL_DHCPD}" = "xy" ]] && install_dhcpd
-[[ "x${INSTALL_LIGHTTPD}" = "xy" ]] && install_lighttpd
-[[ "x${INSTALL_ATFTPD}" = "xy" ]] && install_atftpd
-install_abcd
-[[ "x${INSTALL_IPXE}" = "xy" ]] && install_ipxe
-[[ "x${INSTALL_ABCDDOWNLOADER}" = "xy" ]] && install_abcd_downloader
+                                              install_packages
+[[ "x${INSTALL_SUDO}" = "xy"            ]] && install_and_config_sudo
+                                              install_lhtfs
+[[ "x${INSTALL_BIND9}" = "xy"           ]] && install_bind9
+[[ "x${INSTALL_DHCPD}" = "xy"           ]] && install_dhcpd
+[[ "x${INSTALL_LIGHTTPD}" = "xy"        ]] && install_lighttpd
+[[ "x${INSTALL_ATFTPD}" = "xy"          ]] && install_atftpd
+                                              install_abcd
+[[ "x${INSTALL_IPXE}" = "xy"            ]] && install_ipxe
+[[ "x${INSTALL_ABCDDOWNLOADER}" = "xy"  ]] && install_abcd_downloader
+
 
 display_finished_installation
